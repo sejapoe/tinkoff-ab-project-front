@@ -1,4 +1,5 @@
 import {SectionResponseDto, ShortSectionResponseDto} from "../../../api/Api";
+import {mapTopic, Topic} from "../../topic/model";
 
 export type Section = {
     id: number;
@@ -7,6 +8,7 @@ export type Section = {
 
 export type SectionWithSubsections = Section & {
     subsections: Section[]
+    topics: Topic[]
     parent: Section | null
 }
 
@@ -14,6 +16,7 @@ export const mapSectionWithSubsections = (dto?: SectionResponseDto): SectionWith
     id: dto?.id || -1,
     name: dto?.name || "",
     subsections: dto?.subsections?.map(mapSection) || [],
+    topics: dto?.topics?.map(mapTopic) || [],
     parent: dto?.parent ? mapSection(dto.parent) : null
 })
 

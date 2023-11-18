@@ -1,5 +1,6 @@
 import {useRoutes} from "react-router-dom";
 import {RootSectionView, SectionView} from "../features/section/components/SectionView";
+import {TopicView} from "../features/topic/components/TopicView";
 
 export const AppRoutes = () => {
     return useRoutes([
@@ -10,6 +11,10 @@ export const AppRoutes = () => {
         {
             path: "/sections/:id",
             element: <SectionView/>
+        },
+        {
+            path: "/topics/:id",
+            element: <TopicView/>
         }
     ]);
 }

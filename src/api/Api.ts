@@ -9,10 +9,57 @@
  * ---------------------------------------------------------------
  */
 
-export interface UpdateSectionRequestDto {
+export interface UpdateTopicRequestDto {
+  /** @format int64 */
+  id: number;
+  /** @format int64 */
+  parentId: number;
+  name: string;
+}
+
+export interface DocumentResponseDto {
+  original_name?: string;
+  /** @format int64 */
+  id?: number;
+  filename?: string;
+  type?: "FILE" | "IMAGE";
+}
+
+export interface PostResponseDto {
+  /** @format int64 */
+  parent_id?: number;
+  /** @format int64 */
+  author_id?: number;
+  /** @format date-time */
+  created_at?: string;
+  /** @format int64 */
+  id?: number;
+  text?: string;
+  documents?: DocumentResponseDto[];
+}
+
+export interface TopicResponseDto {
+  /** @format int64 */
+  parent_id?: number;
   /** @format int64 */
   id?: number;
   name?: string;
+  posts?: PostResponseDto[];
+}
+
+export interface UpdateSectionRequestDto {
+  /** @format int64 */
+  id: number;
+  name: string;
+}
+
+export interface SectionResponseDto {
+  /** @format int64 */
+  id?: number;
+  name?: string;
+  subsections?: ShortSectionResponseDto[];
+  topics?: TopicResponseDto[];
+  parent?: ShortSectionResponseDto;
 }
 
 export interface ShortSectionResponseDto {
@@ -21,18 +68,47 @@ export interface ShortSectionResponseDto {
   name?: string;
 }
 
-export interface CreateSectionRequestDto {
+export interface UpdatePostRequestDto {
   /** @format int64 */
-  parentId?: number;
-  name?: string;
+  parent_id: number;
+  /** @format int64 */
+  author_id: number;
+  /** @format int64 */
+  id: number;
+  /**
+   * @minLength 0
+   * @maxLength 200
+   */
+  text: string;
 }
 
-export interface SectionResponseDto {
+export interface CreateTopicRequestDto {
   /** @format int64 */
-  id?: number;
-  name?: string;
-  subsections?: ShortSectionResponseDto[];
-  parent?: ShortSectionResponseDto;
+  parentId: number;
+  name: string;
+}
+
+export interface CreateSectionRequestDto {
+  /** @format int64 */
+  parent_id: number;
+  name: string;
+}
+
+export interface CreatePostRequestDto {
+  /** @format int64 */
+  parentId: number;
+  /** @format int64 */
+  authorId: number;
+  /**
+   * @minLength 0
+   * @maxLength 200
+   */
+  text: string;
+  /**
+   * @maxItems 5
+   * @minItems 0
+   */
+  files?: File[];
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -134,18 +210,26 @@ export class HttpClient<SecurityDataType = unknown> {
       input !== null && (typeof input === "object" || typeof input === "string") ? JSON.stringify(input) : input,
     [ContentType.Text]: (input: any) => (input !== null && typeof input !== "string" ? JSON.stringify(input) : input),
     [ContentType.FormData]: (input: any) =>
-      Object.keys(input || {}).reduce((formData, key) => {
-        const property = input[key];
-        formData.append(
-          key,
-          property instanceof Blob
-            ? property
-            : typeof property === "object" && property !== null
-            ? JSON.stringify(property)
-            : `${property}`,
-        );
-        return formData;
-      }, new FormData()),
+        Object.keys(input || {}).reduce((formData, key) => {
+            const property = input[key];
+
+            if (Array.isArray(property) && property.every(item => item instanceof File)) {
+                property.forEach(value => {
+                    formData.append(key, value)
+                })
+                return formData
+            }
+
+            formData.append(
+                key,
+                property instanceof Blob
+                    ? property
+                    : typeof property === "object" && property !== null
+                        ? JSON.stringify(property)
+                        : `${property}`,
+            );
+            return formData;
+        }, new FormData()),
     [ContentType.UrlEncoded]: (input: any) => this.toQueryString(input),
   };
 
@@ -251,30 +335,105 @@ export class HttpClient<SecurityDataType = unknown> {
  * @baseUrl http://localhost:8080
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  topic = {
+    /**
+     * @description Получение топика
+     *
+     * @tags topic
+     * @name Get
+     * @request GET:/topic
+     */
+    get: (
+      query: {
+        /** @format int64 */
+        id: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<TopicResponseDto, TopicResponseDto>({
+        path: `/topic`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * @description Обновление топика
+     *
+     * @tags topic
+     * @name Update
+     * @request PUT:/topic
+     */
+    update: (data: UpdateTopicRequestDto, params: RequestParams = {}) =>
+      this.request<TopicResponseDto, TopicResponseDto>({
+        path: `/topic`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Создание топика
+     *
+     * @tags topic
+     * @name Create
+     * @request POST:/topic
+     */
+    create: (data: CreateTopicRequestDto, params: RequestParams = {}) =>
+      this.request<TopicResponseDto, TopicResponseDto>({
+        path: `/topic`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Удаление топика
+     *
+     * @tags topic
+     * @name Delete
+     * @request DELETE:/topic
+     */
+    delete: (
+      query: {
+        /** @format int64 */
+        id: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<number, number>({
+        path: `/topic`,
+        method: "DELETE",
+        query: query,
+        ...params,
+      }),
+  };
   sections = {
     /**
-     * No description
+     * @description Получение корневого раздела
      *
-     * @tags section-controller
+     * @tags section
      * @name GetRootSection
      * @request GET:/sections
      */
     getRootSection: (params: RequestParams = {}) =>
-      this.request<SectionResponseDto, any>({
+      this.request<SectionResponseDto, SectionResponseDto>({
         path: `/sections`,
         method: "GET",
         ...params,
       }),
 
     /**
-     * No description
+     * @description Обновление раздела
      *
-     * @tags section-controller
+     * @tags section
      * @name UpdateSection
      * @request PUT:/sections
      */
     updateSection: (data: UpdateSectionRequestDto, params: RequestParams = {}) =>
-      this.request<ShortSectionResponseDto, any>({
+      this.request<SectionResponseDto, ShortSectionResponseDto>({
         path: `/sections`,
         method: "PUT",
         body: data,
@@ -283,14 +442,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * No description
+     * @description Создание раздела
      *
-     * @tags section-controller
+     * @tags section
      * @name CreateSection
      * @request POST:/sections
      */
     createSection: (data: CreateSectionRequestDto, params: RequestParams = {}) =>
-      this.request<ShortSectionResponseDto, any>({
+      this.request<SectionResponseDto, ShortSectionResponseDto>({
         path: `/sections`,
         method: "POST",
         body: data,
@@ -299,30 +458,105 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * No description
+     * @description Получение раздела по ID
      *
-     * @tags section-controller
+     * @tags section
      * @name GetSection
      * @request GET:/sections/{id}
      */
     getSection: (id: number, params: RequestParams = {}) =>
-      this.request<SectionResponseDto, any>({
+      this.request<SectionResponseDto, SectionResponseDto>({
         path: `/sections/${id}`,
         method: "GET",
         ...params,
       }),
 
     /**
-     * No description
+     * @description Обновление раздела
      *
-     * @tags section-controller
+     * @tags section
      * @name DeleteSection
      * @request DELETE:/sections/{id}
      */
     deleteSection: (id: number, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<void, void>({
         path: `/sections/${id}`,
         method: "DELETE",
+        ...params,
+      }),
+  };
+  post = {
+    /**
+     * @description Получение поста
+     *
+     * @tags post
+     * @name Get1
+     * @request GET:/post
+     */
+    get1: (
+      query: {
+        /** @format int64 */
+        id: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostResponseDto, PostResponseDto>({
+        path: `/post`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * @description Обновление поста
+     *
+     * @tags post
+     * @name Update1
+     * @request PUT:/post
+     */
+    update1: (data: UpdatePostRequestDto, params: RequestParams = {}) =>
+      this.request<PostResponseDto, PostResponseDto>({
+        path: `/post`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Удаление поста
+     *
+     * @tags post
+     * @name Delete1
+     * @request DELETE:/post
+     */
+    delete1: (
+      query: {
+        /** @format int64 */
+        id: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<number, number>({
+        path: `/post`,
+        method: "DELETE",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * @description Создание поста
+     *
+     * @tags post
+     * @name CreateWithAttachments
+     * @request POST:/post/withattach
+     */
+    createWithAttachments: (data: CreatePostRequestDto, params: RequestParams = {}) =>
+      this.request<PostResponseDto, PostResponseDto>({
+        path: `/post/withattach`,
+        method: "POST",
+        body: data,
+        type: ContentType.FormData,
         ...params,
       }),
   };
