@@ -1,4 +1,4 @@
-import {DocumentResponseDto, PostResponseDto} from "../../../api/Api";
+import {DocumentResponseDto, PageResponseDtoPostResponseDto, PostResponseDto} from "../../../api/Api";
 
 export type Document = {
     filename: string;
@@ -24,4 +24,20 @@ export const mapPost = (dto: PostResponseDto): Post => ({
     parentId: dto?.parent_id || -1,
     createdAt: dto?.created_at || "",
     documents: dto?.documents?.map(mapDocument) || [],
+})
+
+export type PagePosts = {
+    number: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+    content: Post[];
+}
+
+export const mapPagePosts = (dto: PageResponseDtoPostResponseDto): PagePosts => ({
+    number: dto.number!,
+    size: dto.size!,
+    totalPages: dto.totalPages!,
+    totalElements: dto.totalElements!,
+    content: dto.content?.map(mapPost) || []
 })

@@ -17,34 +17,10 @@ export interface UpdateTopicRequestDto {
   name: string;
 }
 
-export interface DocumentResponseDto {
-  original_name?: string;
-  /** @format int64 */
-  id?: number;
-  filename?: string;
-  type?: "FILE" | "IMAGE";
-}
-
-export interface PostResponseDto {
-  /** @format int64 */
-  parent_id?: number;
-  /** @format int64 */
-  author_id?: number;
-  /** @format date-time */
-  created_at?: string;
-  /** @format int64 */
-  id?: number;
-  text?: string;
-  documents?: DocumentResponseDto[];
-}
-
-export interface TopicResponseDto {
-  /** @format int64 */
-  parent_id?: number;
+export interface ShortTopicResponseDto {
   /** @format int64 */
   id?: number;
   name?: string;
-  posts?: PostResponseDto[];
 }
 
 export interface UpdateSectionRequestDto {
@@ -53,13 +29,25 @@ export interface UpdateSectionRequestDto {
   name: string;
 }
 
+export interface SectionMultiPageResponseDto {
+  /** @format int32 */
+  pageNumber?: number;
+  /** @format int32 */
+  pageSize?: number;
+  /** @format int32 */
+  totalPages?: number;
+  /** @format int64 */
+  totalElements?: number;
+  subsections?: ShortSectionResponseDto[];
+  topics?: ShortTopicResponseDto[];
+}
+
 export interface SectionResponseDto {
   /** @format int64 */
   id?: number;
   name?: string;
-  subsections?: ShortSectionResponseDto[];
-  topics?: TopicResponseDto[];
   parent?: ShortSectionResponseDto;
+  page?: SectionMultiPageResponseDto;
 }
 
 export interface ShortSectionResponseDto {
@@ -80,6 +68,27 @@ export interface UpdatePostRequestDto {
    * @maxLength 200
    */
   text: string;
+}
+
+export interface DocumentResponseDto {
+  original_name?: string;
+  /** @format int64 */
+  id?: number;
+  filename?: string;
+  type?: "FILE" | "IMAGE";
+}
+
+export interface PostResponseDto {
+  /** @format int64 */
+  parent_id?: number;
+  /** @format int64 */
+  author_id?: number;
+  /** @format date-time */
+  created_at?: string;
+  /** @format int64 */
+  id?: number;
+  text?: string;
+  documents?: DocumentResponseDto[];
 }
 
 export interface CreateTopicRequestDto {
@@ -109,6 +118,27 @@ export interface CreatePostRequestDto {
    * @minItems 0
    */
   files?: File[];
+}
+
+export interface PageResponseDtoPostResponseDto {
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  size?: number;
+  /** @format int32 */
+  totalPages?: number;
+  /** @format int64 */
+  totalElements?: number;
+  content?: PostResponseDto[];
+}
+
+export interface TopicResponseDto {
+  /** @format int64 */
+  parent_id?: number;
+  /** @format int64 */
+  id?: number;
+  name?: string;
+  posts?: PageResponseDtoPostResponseDto;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -337,27 +367,6 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   topic = {
     /**
-     * @description Получение топика
-     *
-     * @tags topic
-     * @name Get
-     * @request GET:/topic
-     */
-    get: (
-      query: {
-        /** @format int64 */
-        id: number;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<TopicResponseDto, TopicResponseDto>({
-        path: `/topic`,
-        method: "GET",
-        query: query,
-        ...params,
-      }),
-
-    /**
      * @description Обновление топика
      *
      * @tags topic
@@ -365,7 +374,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request PUT:/topic
      */
     update: (data: UpdateTopicRequestDto, params: RequestParams = {}) =>
-      this.request<TopicResponseDto, TopicResponseDto>({
+      this.request<ShortTopicResponseDto, ShortTopicResponseDto>({
         path: `/topic`,
         method: "PUT",
         body: data,
@@ -381,7 +390,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/topic
      */
     create: (data: CreateTopicRequestDto, params: RequestParams = {}) =>
-      this.request<TopicResponseDto, TopicResponseDto>({
+      this.request<ShortTopicResponseDto, ShortTopicResponseDto>({
         path: `/topic`,
         method: "POST",
         body: data,
@@ -409,6 +418,30 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         query: query,
         ...params,
       }),
+
+    /**
+     * @description Получение топика
+     *
+     * @tags topic
+     * @name Get
+     * @request GET:/topic/{id}
+     */
+    get: (
+      id: number,
+      query?: {
+        /** @format int32 */
+        pageNumber?: number;
+        /** @format int32 */
+        forPage?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<TopicResponseDto, TopicResponseDto>({
+        path: `/topic/${id}`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
   };
   sections = {
     /**
@@ -418,10 +451,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name GetRootSection
      * @request GET:/sections
      */
-    getRootSection: (params: RequestParams = {}) =>
+    getRootSection: (
+      query?: {
+        /** @format int32 */
+        pageNumber?: number;
+        /** @format int32 */
+        forPage?: number;
+      },
+      params: RequestParams = {},
+    ) =>
       this.request<SectionResponseDto, SectionResponseDto>({
         path: `/sections`,
         method: "GET",
+        query: query,
         ...params,
       }),
 
@@ -464,10 +506,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name GetSection
      * @request GET:/sections/{id}
      */
-    getSection: (id: number, params: RequestParams = {}) =>
+    getSection: (
+      id: number,
+      query?: {
+        /** @format int32 */
+        pageNumber?: number;
+        /** @format int32 */
+        forPage?: number;
+      },
+      params: RequestParams = {},
+    ) =>
       this.request<SectionResponseDto, SectionResponseDto>({
         path: `/sections/${id}`,
         method: "GET",
+        query: query,
         ...params,
       }),
 

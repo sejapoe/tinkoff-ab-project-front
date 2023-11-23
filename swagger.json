@@ -26,56 +26,6 @@
   ],
   "paths": {
     "/topic": {
-      "get": {
-        "tags": [
-          "topic"
-        ],
-        "description": "Получение топика",
-        "operationId": "get",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Неверный формат данных",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TopicResponseDto"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Топик получен",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TopicResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Топик не найден",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TopicResponseDto"
-                }
-              }
-            }
-          }
-        }
-      },
       "put": {
         "tags": [
           "topic"
@@ -98,7 +48,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TopicResponseDto"
+                  "$ref": "#/components/schemas/ShortTopicResponseDto"
                 }
               }
             }
@@ -108,7 +58,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TopicResponseDto"
+                  "$ref": "#/components/schemas/ShortTopicResponseDto"
                 }
               }
             }
@@ -118,7 +68,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TopicResponseDto"
+                  "$ref": "#/components/schemas/ShortTopicResponseDto"
                 }
               }
             }
@@ -147,7 +97,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TopicResponseDto"
+                  "$ref": "#/components/schemas/ShortTopicResponseDto"
                 }
               }
             }
@@ -157,7 +107,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TopicResponseDto"
+                  "$ref": "#/components/schemas/ShortTopicResponseDto"
                 }
               }
             }
@@ -225,6 +175,26 @@
         ],
         "description": "Получение корневого раздела",
         "operationId": "getRootSection",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "forPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "404": {
             "description": "Корневой раздел отсутствует",
@@ -572,6 +542,76 @@
         }
       }
     },
+    "/topic/{id}": {
+      "get": {
+        "tags": [
+          "topic"
+        ],
+        "description": "Получение топика",
+        "operationId": "get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "forPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicResponseDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Топик получен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Топик не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/sections/{id}": {
       "get": {
         "tags": [
@@ -588,11 +628,29 @@
               "type": "integer",
               "format": "int64"
             }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "forPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         ],
         "responses": {
-          "404": {
-            "description": "Раздел не найден",
+          "200": {
+            "description": "Раздел",
             "content": {
               "*/*": {
                 "schema": {
@@ -601,8 +659,8 @@
               }
             }
           },
-          "200": {
-            "description": "Раздел",
+          "404": {
+            "description": "Раздел не найден",
             "content": {
               "*/*": {
                 "schema": {
@@ -726,6 +784,125 @@
           }
         }
       },
+      "ShortTopicResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateSectionRequestDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "SectionMultiPageResponseDto": {
+        "type": "object",
+        "properties": {
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "subsections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShortSectionResponseDto"
+            }
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShortTopicResponseDto"
+            }
+          }
+        }
+      },
+      "SectionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/ShortSectionResponseDto"
+          },
+          "page": {
+            "$ref": "#/components/schemas/SectionMultiPageResponseDto"
+          }
+        }
+      },
+      "ShortSectionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdatePostRequestDto": {
+        "required": [
+          "author_id",
+          "id",
+          "parent_id",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "parent_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "author_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "text": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
       "DocumentResponseDto": {
         "type": "object",
         "properties": {
@@ -775,111 +952,6 @@
             "items": {
               "$ref": "#/components/schemas/DocumentResponseDto"
             }
-          }
-        }
-      },
-      "TopicResponseDto": {
-        "type": "object",
-        "properties": {
-          "parent_id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "posts": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PostResponseDto"
-            }
-          }
-        }
-      },
-      "UpdateSectionRequestDto": {
-        "required": [
-          "id",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "SectionResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "subsections": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ShortSectionResponseDto"
-            }
-          },
-          "topics": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TopicResponseDto"
-            }
-          },
-          "parent": {
-            "$ref": "#/components/schemas/ShortSectionResponseDto"
-          }
-        }
-      },
-      "ShortSectionResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "UpdatePostRequestDto": {
-        "required": [
-          "author_id",
-          "id",
-          "parent_id",
-          "text"
-        ],
-        "type": "object",
-        "properties": {
-          "parent_id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "author_id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "text": {
-            "maxLength": 200,
-            "minLength": 0,
-            "type": "string"
           }
         }
       },
@@ -944,6 +1016,52 @@
               "type": "string",
               "format": "binary"
             }
+          }
+        }
+      },
+      "PageResponseDtoPostResponseDto": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostResponseDto"
+            }
+          }
+        }
+      },
+      "TopicResponseDto": {
+        "type": "object",
+        "properties": {
+          "parent_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "posts": {
+            "$ref": "#/components/schemas/PageResponseDtoPostResponseDto"
           }
         }
       }

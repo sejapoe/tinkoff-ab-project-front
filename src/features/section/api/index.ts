@@ -1,12 +1,14 @@
 import {CreateSectionRequestDto, RequestParams} from "../../../api/Api";
 import {useMutation, UseMutationOptions, useQuery} from "@tanstack/react-query";
-import {mapSectionWithSubsections, SectionWithSubsections} from "../model";
+import {mapSection, mapSectionWithSubsections, Section, SectionWithSubsections} from "../model";
 import api, {GenericErrorModel} from "../../../api";
+import {PageRequest} from "../../../model/page";
 
 export const sectionKeys = {
     sections: {
         root: ['sections'],
-        byId: (id: number) => [...sectionKeys.sections.root, id]
+        byId: (id: number) => [...sectionKeys.sections.root, id],
+        byQuery: (query: UseSectionQuery) => [...sectionKeys.sections.root, query]
     },
 
     mutations: {
@@ -14,43 +16,53 @@ export const sectionKeys = {
     }
 }
 
-export const useSection = (id: number, params?: RequestParams) =>
+type UseSectionQuery = {
+    id: number;
+} & PageRequest
+
+export const useSection = (query: UseSectionQuery, params?: RequestParams) =>
     useQuery<SectionWithSubsections, GenericErrorModel, SectionWithSubsections, unknown[]>({
-        queryKey: sectionKeys.sections.byId(id),
+        queryKey: sectionKeys.sections.byQuery(query),
         queryFn: async ({signal}) => {
-            const response = await api.sections.getSection(id, {
-                signal,
-                ...params
-            })
+            const response = await api.sections.getSection(query.id,
+                query,
+                {
+                    signal,
+                    ...params
+                })
 
             return mapSectionWithSubsections(response.data)
         }
     })
 
-export const useRootSection = (params?: RequestParams) =>
+export const useRootSection = (page: PageRequest, params?: RequestParams) =>
     useQuery<SectionWithSubsections, GenericErrorModel, SectionWithSubsections, unknown[]>({
-        queryKey: sectionKeys.sections.root,
+        queryKey: sectionKeys.sections.byQuery({
+            ...page,
+            id: -1
+        }),
         queryFn: async ({signal}) => {
-            const response = await api.sections.getRootSection({
-                signal,
-                ...params
-            })
+            const response = await api.sections.getRootSection(page,
+                {
+                    signal,
+                    ...params
+                })
 
             return mapSectionWithSubsections(response.data)
         }
     })
 
-export type UseCreateSectionMutation = UseMutationOptions<SectionWithSubsections, GenericErrorModel, CreateSectionRequestDto, unknown[]>
+export type UseCreateSectionMutation = UseMutationOptions<Section, GenericErrorModel, CreateSectionRequestDto, unknown[]>
 
-type UseCreateSectionOptions = Omit<UseCreateSectionMutation, 'mutationFn' | 'mutationKey'>
+type UseCreateSectionOptions = Omit<Section, 'mutationFn' | 'mutationKey'>
 
 export const useCreateSection = (options?: UseCreateSectionOptions) =>
-    useMutation<SectionWithSubsections, GenericErrorModel, CreateSectionRequestDto, unknown[]>({
+    useMutation<Section, GenericErrorModel, CreateSectionRequestDto, unknown[]>({
         mutationKey: sectionKeys.mutations.createSection,
         mutationFn: async (dto) => {
             const response = await api.sections.createSection(dto)
 
-            return mapSectionWithSubsections(response.data)
+            return mapSection(response.data)
         },
         ...options
     })

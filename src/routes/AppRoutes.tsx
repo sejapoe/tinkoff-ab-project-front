@@ -1,5 +1,5 @@
 import {useRoutes} from "react-router-dom";
-import {RootSectionView, SectionView} from "../features/section/components/SectionView";
+import {RootSectionView, SectionView} from "../features/section/components/SectionLoader";
 import {TopicView} from "../features/topic/components/TopicView";
 
 export const AppRoutes = () => {

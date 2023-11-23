@@ -23,6 +23,9 @@ export const useCreatePost = (sectionId: number, options?: UseCreatePostOptions)
         mutationFn: async (dto) => {
             const response = await api.post.createWithAttachments(dto);
 
+            console.log(response)
+            console.log(response.data)
+
             return mapPost(response.data)
         },
         ...options
