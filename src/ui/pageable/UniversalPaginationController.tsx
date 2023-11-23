@@ -30,7 +30,7 @@ export const UniversalPaginationController = ({totalPages}: UniversalPaginationC
                                  enabled={page > 0} fn={() => selectPage(0)}/>
                 <PaginationArrow icon={solid("angle-left")}
                                  enabled={page > 0} fn={prev}/>
-                <span>{page + 1} / {totalPages}</span>
+                <span>{page + 1} / {totalPages !== 0 ? totalPages : 1}</span>
                 <PaginationArrow icon={solid("angle-right")}
                                  enabled={page < totalPages - 1} fn={next}/>
                 <PaginationArrow icon={solid("angles-right")}
