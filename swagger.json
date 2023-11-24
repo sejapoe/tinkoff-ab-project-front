@@ -83,7 +83,7 @@
         "operationId": "create",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "$ref": "#/components/schemas/CreateTopicRequestDto"
               }
@@ -196,8 +196,8 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Корневой раздел отсутствует",
+          "200": {
+            "description": "Корневой раздел",
             "content": {
               "*/*": {
                 "schema": {
@@ -206,8 +206,8 @@
               }
             }
           },
-          "200": {
-            "description": "Корневой раздел",
+          "404": {
+            "description": "Корневой раздел отсутствует",
             "content": {
               "*/*": {
                 "schema": {
@@ -957,8 +957,10 @@
       },
       "CreateTopicRequestDto": {
         "required": [
+          "authorId",
           "name",
-          "parentId"
+          "parentId",
+          "text"
         ],
         "type": "object",
         "properties": {
@@ -968,6 +970,24 @@
           },
           "name": {
             "type": "string"
+          },
+          "authorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "text": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "files": {
+            "maxItems": 5,
+            "minItems": 0,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            }
           }
         }
       },

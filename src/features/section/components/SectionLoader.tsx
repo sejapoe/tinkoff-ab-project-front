@@ -1,27 +1,78 @@
 import {SectionWithSubsections} from "../model";
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {sectionKeys, useCreateSection, useRootSection, useSection} from "../api";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import {useQueryClient} from "@tanstack/react-query";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {regular, solid} from "@fortawesome/fontawesome-svg-core/import.macro";
 import {useCreateTopic} from "../../topic/api";
 import Pageable from "../../../ui/pageable/Pageable";
-import {IconProp} from "@fortawesome/fontawesome-svg-core";
-import clsx from "clsx";
 import {UniversalPaginationController} from "../../../ui/pageable/UniversalPaginationController";
+import {Disclosure} from "@headlessui/react";
 
 type SectionProps = {
     section: SectionWithSubsections
 }
 
 const allowedNames = ["Конспекты семинаров", "Контрольные работы", "Литература"]
+const CreateTopicForm = ({section}: { section: SectionWithSubsections }) => {
+    const queryClient = useQueryClient()
+    const [name, setName] = useState("")
+    const [files, setFiles] = useState<File[]>([])
+    const [text, setText] = useState("")
+    const {mutate: createTopic} = useCreateTopic(section.id)
+    const formRef = useRef<HTMLFormElement>(null)
+    const nav = useNavigate()
 
-const CreateForm = ({section}: { section: SectionWithSubsections }) => {
+    return <form
+        ref={formRef}
+        onSubmit={event => {
+            event.preventDefault()
+            if (name === "" || text === "") return
+
+            createTopic({
+                name,
+                parentId: section.id,
+                authorId: -1,
+                text,
+                files
+            }, {
+                onSuccess: async (data) => {
+                    await queryClient.invalidateQueries({queryKey: sectionKeys.sections.root});
+                    setName("")
+                    setText("")
+                    setFiles([])
+                    formRef.current?.reset()
+                    nav(`/topics/${data.id}`)
+                }
+            })
+        }} className="space-y-4">
+        <input type="text" value={name} onChange={event => setName(event.target.value)}
+               className="border border-gray-600 rounded-md placeholder-gray-600 w-full p-2"
+               placeholder={"Название темы"}/>
+
+        <textarea className="w-full h-32 p-2 border border-gray-600 rounded-md resize-none placeholder-gray-600"
+                  value={text}
+                  onChange={e => setText(e.target.value)}
+                  placeholder={"Напишите пост..."}
+        />
+
+        <input type="file"
+               multiple
+               onChange={e => setFiles(e.target.files ? Array.from(e.target.files) : [])}
+        />
+
+        <button type={"submit"}
+                className="px-4 py-2 border border-blue-500 text-blue-500 hover:border-blue-700 bg-white rounded-md w-full">
+            Отправить
+        </button>
+    </form>
+}
+
+const CreateSubjectForm = ({section}: { section: SectionWithSubsections }) => {
     const queryClient = useQueryClient()
     const [input, setInput] = useState("")
     const {mutate: createSection} = useCreateSection()
-    const {mutate: createTopic} = useCreateTopic(section.id)
 
     return <>
         {section.name.endsWith("курс") ?
@@ -43,29 +94,23 @@ const CreateForm = ({section}: { section: SectionWithSubsections }) => {
                     <input type="text" value={input} onChange={event => setInput(event.target.value)}
                            className="ml-2 border border-blue-600"/>
                 </label>
-            </form> :
-            allowedNames.includes(section.name) ?
-                <form onSubmit={event => {
-                    if (input === "") return
-                    createTopic({
-                        name: input,
-                        parentId: section.id
-                    }, {
-                        onSuccess: async () => {
-                            await queryClient.invalidateQueries({queryKey: sectionKeys.sections.root});
-                            setInput("")
-                        }
-                    })
-                    event.preventDefault()
-                }}>
-                    <label className="text-xl text-black">
-                        Новая тема:
-                        <input type="text" value={input} onChange={event => setInput(event.target.value)}
-                               className="ml-2 border border-blue-600"/>
-                    </label>
-                </form> : null
+            </form> : null
         }
     </>;
+}
+
+function CreateTopicFormWrapper({section}: { section: SectionWithSubsections }) {
+    return allowedNames.includes(section.name) ?
+        <div className="w-1/3">
+            <Disclosure>
+                <Disclosure.Button className="px-4 py-2 bg-gray-300 border border-gray-400 rounded">
+                    Создание темы <FontAwesomeIcon icon={solid("chevron-down")} className="ml-2"/>
+                </Disclosure.Button>
+                <Disclosure.Panel className="mt-2">
+                    <CreateTopicForm section={section}/>
+                </Disclosure.Panel>
+            </Disclosure>
+        </div> : null;
 }
 
 const Section = ({section}: SectionProps) => {
@@ -78,8 +123,9 @@ const Section = ({section}: SectionProps) => {
             <p className="text-3xl text-black">
                 {section.name}
             </p>
-            <CreateForm section={section}/>
+            <CreateSubjectForm section={section}/>
         </div>
+        <CreateTopicFormWrapper section={section}/>
         <ul>
             {section.page.subsections.map(value => (
                 <li key={`section-${value.id}`} className="text-xl ml-4 text-blue-500 hover:text-blue-700 w-fit">

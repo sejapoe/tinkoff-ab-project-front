@@ -95,6 +95,18 @@ export interface CreateTopicRequestDto {
   /** @format int64 */
   parentId: number;
   name: string;
+  /** @format int64 */
+  authorId: number;
+  /**
+   * @minLength 0
+   * @maxLength 200
+   */
+  text: string;
+  /**
+   * @maxItems 5
+   * @minItems 0
+   */
+  files?: File[];
 }
 
 export interface CreateSectionRequestDto {
@@ -394,7 +406,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/topic`,
         method: "POST",
         body: data,
-        type: ContentType.Json,
+        type: ContentType.FormData,
         ...params,
       }),
 
