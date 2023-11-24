@@ -1,6 +1,18 @@
-import {Api, ContentType, HttpResponse} from "./Api";
+import {Api, HttpResponse} from "./Api";
 
-type GenericErrorModel = HttpResponse<unknown, String>
+export interface ProblemDetailDto {
+    /** @format uri */
+    type?: string;
+    title?: string;
+    /** @format int32 */
+    status?: number;
+    detail?: string;
+    /** @format uri */
+    instance?: string;
+    properties?: Record<string, object>;
+}
+
+type GenericErrorModel = HttpResponse<unknown, ProblemDetailDto>
 
 const api = new Api<string>({
     baseApiParams: {

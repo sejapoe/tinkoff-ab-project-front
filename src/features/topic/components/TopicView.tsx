@@ -8,6 +8,7 @@ import {useCreatePost} from "../../post/api";
 import {useQueryClient} from "@tanstack/react-query";
 import Pageable from "../../../ui/pageable/Pageable";
 import {UniversalPaginationController} from "../../../ui/pageable/UniversalPaginationController";
+import {MAX_FILE_SIZE, MAX_SUMMARY_FILE_SIZE} from "../../../utils/consants";
 
 export type CreateFormProps = {
     parentId: number
@@ -24,7 +25,14 @@ const CreateForm = ({parentId}: CreateFormProps) => {
         ref={formRef}
         onSubmit={e => {
             e.preventDefault()
-            if (text === "") return
+            if (text === "") return alert("Заполните все обязательные поля")
+
+            console.log(files.map(file => file.size))
+
+            if (files.some(file => file.size > MAX_FILE_SIZE)
+                || files.reduce((partSum: number, file: File) => partSum + file.size, 0) > MAX_SUMMARY_FILE_SIZE) {
+                return alert("Размер файлов превышает лимит");
+            }
 
             mutate({
                 parentId,
@@ -37,6 +45,10 @@ const CreateForm = ({parentId}: CreateFormProps) => {
                     setFiles([])
                     formRef.current?.reset()
                     await queryClient.invalidateQueries({queryKey: topicKeys.topics.root})
+                },
+                onError: err => {
+                    console.log(err)
+                    alert(err.error.detail)
                 }
             })
         }}
@@ -77,10 +89,10 @@ const TopicComponent = ({topic}: TopicComponentProps) => {
         <div className="mt-4 space-y-4 w-1/2">
             {topic.posts.content.map(value => (
                 <div key={`post-${value.id}`} className="flex flex-col space-y-2 border border-gray-600 p-2 rounded">
-                    <text>{value.text}</text>
+                    <p className="whitespace-pre-line">{value.text}</p>
                     {value.documents.length > 0 && <div className="flex flex-col space-y-2 border-t border-gray-600">
                         {value.documents.map(value => (
-                            <div key={`document-${value}`} className="flex items-center mt-4 space-x-2">
+                            <div key={`document-${value.filename}`} className="flex items-center mt-4 space-x-2">
                                 <a href={`http://localhost:8080/files/${value.filename}`} target="_blank"
                                    rel="noreferrer"
                                    className="text-blue-500 hover:text-blue-700">

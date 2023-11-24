@@ -9,6 +9,7 @@ import {useCreateTopic} from "../../topic/api";
 import Pageable from "../../../ui/pageable/Pageable";
 import {UniversalPaginationController} from "../../../ui/pageable/UniversalPaginationController";
 import {Disclosure} from "@headlessui/react";
+import {MAX_FILE_SIZE, MAX_SUMMARY_FILE_SIZE} from "../../../utils/consants";
 
 type SectionProps = {
     section: SectionWithSubsections
@@ -28,7 +29,14 @@ const CreateTopicForm = ({section}: { section: SectionWithSubsections }) => {
         ref={formRef}
         onSubmit={event => {
             event.preventDefault()
-            if (name === "" || text === "") return
+            if (name === "" || text === "") return alert("Заполните все обязательные поля")
+
+            console.log(files.map(file => file.size))
+
+            if (files.some(file => file.size > MAX_FILE_SIZE)
+                || files.reduce((partSum: number, file: File) => partSum + file.size, 0) > MAX_SUMMARY_FILE_SIZE) {
+                return alert("Размер файлов превышает лимит");
+            }
 
             createTopic({
                 name,
@@ -44,6 +52,9 @@ const CreateTopicForm = ({section}: { section: SectionWithSubsections }) => {
                     setFiles([])
                     formRef.current?.reset()
                     nav(`/topics/${data.id}`)
+                },
+                onError: err => {
+                    alert(err.error.detail)
                 }
             })
         }} className="space-y-4">
