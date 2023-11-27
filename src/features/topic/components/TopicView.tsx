@@ -9,12 +9,14 @@ import {useQueryClient} from "@tanstack/react-query";
 import Pageable from "../../../ui/pageable/Pageable";
 import {UniversalPaginationController} from "../../../ui/pageable/UniversalPaginationController";
 import {MAX_FILE_SIZE, MAX_SUMMARY_FILE_SIZE} from "../../../utils/consants";
+import {useCurrentUser} from "../../auth/model";
 
 export type CreateFormProps = {
     parentId: number
 }
 
 const CreateForm = ({parentId}: CreateFormProps) => {
+    const user = useCurrentUser()
     const queryClient = useQueryClient()
     const [files, setFiles] = useState<File[]>([])
     const [text, setText] = useState("")
@@ -36,7 +38,7 @@ const CreateForm = ({parentId}: CreateFormProps) => {
 
             mutate({
                 parentId,
-                authorId: -1,
+                authorId: user?.id || -1,
                 text,
                 files,
             }, {
@@ -77,7 +79,7 @@ type TopicComponentProps = {
 }
 
 const TopicComponent = ({topic}: TopicComponentProps) => {
-    return <div className="p-8">
+    return <div className="px-8">
         <Link to={`/sections/${topic.parentId}`} className="text-xl text-blue-500 hover:text-blue-700">
             <FontAwesomeIcon icon={solid("chevron-left")} className="mr-2"/>Назад
         </Link>

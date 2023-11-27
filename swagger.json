@@ -20,6 +20,10 @@
       "description": "Работа с разделами"
     },
     {
+      "name": "auth",
+      "description": "Авторизация на сайте"
+    },
+    {
       "name": "post",
       "description": "Работа с постами"
     }
@@ -73,7 +77,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -88,8 +97,7 @@
                 "$ref": "#/components/schemas/CreateTopicRequestDto"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "400": {
@@ -165,7 +173,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          }
+        ]
       }
     },
     "/sections": {
@@ -415,7 +428,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -468,7 +486,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          }
+        ]
       }
     },
     "/post/withattach": {
@@ -508,7 +531,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          }
+        ]
       }
     },
     "/files": {
@@ -538,6 +566,66 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "signUp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/JwtResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JwtRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/JwtResponseDto"
+                }
+              }
+            }
           }
         }
       }
@@ -860,6 +948,20 @@
           },
           "page": {
             "$ref": "#/components/schemas/SectionMultiPageResponseDto"
+          },
+          "rights": {
+            "$ref": "#/components/schemas/SectionRightsDto"
+          }
+        }
+      },
+      "SectionRightsDto": {
+        "type": "object",
+        "properties": {
+          "canCreateSubsections": {
+            "type": "boolean"
+          },
+          "canCreateTopics": {
+            "type": "boolean"
           }
         }
       },
@@ -935,6 +1037,9 @@
           "author_id": {
             "type": "integer",
             "format": "int64"
+          },
+          "author_name": {
+            "type": "string"
           },
           "created_at": {
             "type": "string",
@@ -1036,6 +1141,43 @@
               "type": "string",
               "format": "binary"
             }
+          }
+        }
+      },
+      "SignUpRequestDto": {
+        "type": "object",
+        "properties": {
+          "confirm_password": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "JwtResponseDto": {
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "JwtRequestDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
           }
         }
       },

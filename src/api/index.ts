@@ -16,9 +16,11 @@ type GenericErrorModel = HttpResponse<unknown, ProblemDetailDto>
 
 const api = new Api<string>({
     baseApiParams: {
-        format: "json"
+        format: "json",
+        secure: true
     },
     securityWorker: (token) => {
+        console.log(token)
         return token ? {headers: {Authorization: `Bearer ${token}`}} : {};
     }
 })

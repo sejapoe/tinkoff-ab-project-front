@@ -86,7 +86,7 @@ const CreateSubjectForm = ({section}: { section: SectionWithSubsections }) => {
     const {mutate: createSection} = useCreateSection()
 
     return <>
-        {section.name.endsWith("курс") ?
+        {section.rights.canCreateSubsections ?
             <form onSubmit={event => {
                 if (input === "") return
                 createSection({
@@ -111,7 +111,7 @@ const CreateSubjectForm = ({section}: { section: SectionWithSubsections }) => {
 }
 
 function CreateTopicFormWrapper({section}: { section: SectionWithSubsections }) {
-    return allowedNames.includes(section.name) ?
+    return section.rights.canCreateTopics ?
         <div className="w-1/3">
             <Disclosure>
                 <Disclosure.Button className="px-4 py-2 bg-gray-300 border border-gray-400 rounded">
@@ -125,7 +125,7 @@ function CreateTopicFormWrapper({section}: { section: SectionWithSubsections }) 
 }
 
 const Section = ({section}: SectionProps) => {
-    return <div className="p-8">
+    return <div className="px-8">
         {section.parent &&
             <Link to={`/sections/${section.parent.id}`} className="text-xl text-blue-500 hover:text-blue-700">
                 <FontAwesomeIcon icon={solid("chevron-left")} className="mr-2"/>{section.parent.name}
