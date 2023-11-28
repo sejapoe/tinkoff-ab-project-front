@@ -20,7 +20,7 @@ export const SignUpForm = () => {
             <form className="p-8 flex flex-col shadow space-y-6" onSubmit={handleSubmit(data => {
                 mutate(data, {
                     onSuccess: () => {
-                        nav("/")
+                        nav(-1)
                     }
                 })
             })}>

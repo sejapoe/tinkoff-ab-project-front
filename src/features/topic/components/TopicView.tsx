@@ -79,6 +79,8 @@ type TopicComponentProps = {
 }
 
 const TopicComponent = ({topic}: TopicComponentProps) => {
+    const user = useCurrentUser()
+
     return <div className="px-8">
         <Link to={`/sections/${topic.parentId}`} className="text-xl text-blue-500 hover:text-blue-700">
             <FontAwesomeIcon icon={solid("chevron-left")} className="mr-2"/>Назад
@@ -104,12 +106,16 @@ const TopicComponent = ({topic}: TopicComponentProps) => {
                             </div>
                         ))}
                     </div>}
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-600 text-gray-600">
+                        <span><FontAwesomeIcon icon={regular("user")} className="mr-1"/>{value.authorName}</span>
+                        <span><FontAwesomeIcon icon={regular("clock")} className="mr-1"/> {new Date(value.createdAt).toLocaleString()}</span>
+                    </div>
                 </div>
             ))}
             <UniversalPaginationController totalPages={topic.posts.totalPages}/>
-            <div className="flex flex-col space-y-2">
+            {user && <div className="flex flex-col space-y-2">
                 <CreateForm parentId={topic.id}/>
-            </div>
+            </div>}
         </div>
     </div>
 }
