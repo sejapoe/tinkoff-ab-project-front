@@ -149,6 +149,7 @@ export interface SignUpRequestDto {
 export interface JwtResponseDto {
     /** @format int64 */
     account_id?: number;
+    username?: string;
     token?: string;
 }
 

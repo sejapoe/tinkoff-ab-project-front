@@ -21,7 +21,8 @@ export const SignUpForm = () => {
                 mutate(data, {
                     onSuccess: () => {
                         nav(-1)
-                    }
+                    },
+                    onError: err => alert(err.error.detail)
                 })
             })}>
                 <InputField label="Имя пользователя" error={formState.errors["name"]}

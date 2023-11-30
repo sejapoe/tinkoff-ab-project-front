@@ -13,25 +13,31 @@ export const MainLayout = () => {
             <div className="w-full h-8 shadow flex justify-end items-center">
                 {
                     user ?
-                        <button onClick={async () => {
-                            await queryClient.invalidateQueries({queryKey: sectionKeys.sections.root})
-                            deleteToken()
-                        }}>
-                            Выйти
-                        </button>
+                        <div className="mx-4 space-x-2">
+                            <span>{user.username}</span>
+                            <button onClick={async () => {
+                                await queryClient.invalidateQueries({queryKey: sectionKeys.sections.root})
+                                deleteToken()
+                            }} className="hover:text-cyan-700 text-blue-700">
+                                Выйти
+                            </button>
+                        </div>
+
                         : <div className="mx-4 space-x-2">
                             <button onClick={() => nav("/login")}
-                                    className="hover:text-cyan-700">
+                                    className="hover:text-cyan-700 text-blue-700">
                                 Войти
                             </button>
                             <button onClick={() => nav("/signup")}
-                                    className="hover:text-cyan-700">
+                                    className="hover:text-cyan-700 text-blue-700">
                                 Регистрация
                             </button>
                         </div>
                 }
             </div>
-            <Outlet/>
+            <div className="mt-2">
+                <Outlet/>
+            </div>
         </div>
     );
 }

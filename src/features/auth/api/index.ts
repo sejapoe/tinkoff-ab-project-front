@@ -25,6 +25,7 @@ export const useSignUp = (options?: UseSignUpOptions) =>
 
             addUser({
                 id: response.data.account_id!,
+                username: response.data.username!,
                 token: response.data.token!
             })
         },
@@ -44,6 +45,7 @@ export const useLogin = (options?: UseLoginOptions) =>
 
             addUser({
                 id: response.data.account_id!,
+                username: response.data.username!,
                 token: response.data.token!
             })
         },

@@ -10,6 +10,9 @@ import Pageable from "../../../ui/pageable/Pageable";
 import {UniversalPaginationController} from "../../../ui/pageable/UniversalPaginationController";
 import {Disclosure} from "@headlessui/react";
 import {MAX_FILE_SIZE, MAX_SUMMARY_FILE_SIZE} from "../../../utils/consants";
+import {useCurrentUser} from "../../auth/model";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
 
 type SectionProps = {
     section: SectionWithSubsections
@@ -17,6 +20,7 @@ type SectionProps = {
 
 const allowedNames = ["Конспекты семинаров", "Контрольные работы", "Литература"]
 const CreateTopicForm = ({section}: { section: SectionWithSubsections }) => {
+    const user = useCurrentUser()
     const queryClient = useQueryClient()
     const [name, setName] = useState("")
     const [files, setFiles] = useState<File[]>([])
@@ -41,7 +45,7 @@ const CreateTopicForm = ({section}: { section: SectionWithSubsections }) => {
             createTopic({
                 name,
                 parentId: section.id,
-                authorId: -1,
+                authorId: user?.id || -1,
                 text,
                 files
             }, {
@@ -95,6 +99,10 @@ const CreateSubjectForm = ({section}: { section: SectionWithSubsections }) => {
                 }, {
                     onSuccess: async () => {
                         await queryClient.invalidateQueries({queryKey: sectionKeys.sections.root});
+                        setInput("")
+                    },
+                    onError: error => {
+                        alert(error.error.detail)
                         setInput("")
                     }
                 })

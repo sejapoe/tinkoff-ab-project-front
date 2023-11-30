@@ -36,6 +36,15 @@ const CreateForm = ({parentId}: CreateFormProps) => {
                 return alert("Размер файлов превышает лимит");
             }
 
+            console.log(
+                {
+                    parentId,
+                    authorId: user?.id || -1,
+                    text,
+                    files,
+                }
+            )
+
             mutate({
                 parentId,
                 authorId: user?.id || -1,
@@ -53,14 +62,15 @@ const CreateForm = ({parentId}: CreateFormProps) => {
                     alert(err.error.detail)
                 }
             })
-        }}
+        }
+        }
         className="space-y-2"
     >
-        <textarea className="w-full h-32 p-2 border border-gray-600 rounded-md resize-none placeholder-gray-600"
-                  value={text}
-                  onChange={e => setText(e.target.value)}
-                  placeholder={"Напишите пост..."}
-        />
+            <textarea className="w-full h-32 p-2 border border-gray-600 rounded-md resize-none placeholder-gray-600"
+                      value={text}
+                      onChange={e => setText(e.target.value)}
+                      placeholder={"Напишите пост..."}
+            />
 
         <input type="file"
                multiple
@@ -78,7 +88,10 @@ type TopicComponentProps = {
     topic: TopicWithPosts
 }
 
-const TopicComponent = ({topic}: TopicComponentProps) => {
+const TopicComponent = ({
+                            topic
+                        }: TopicComponentProps
+) => {
     const user = useCurrentUser()
 
     return <div className="px-8">
@@ -92,23 +105,27 @@ const TopicComponent = ({topic}: TopicComponentProps) => {
         </div>
         <div className="mt-4 space-y-4 w-1/2">
             {topic.posts.content.map(value => (
-                <div key={`post-${value.id}`} className="flex flex-col space-y-2 border border-gray-600 p-2 rounded">
+                <div key={`post-${value.id}`}
+                     className="flex flex-col space-y-2 border border-gray-600 p-2 rounded">
                     <p className="whitespace-pre-line">{value.text}</p>
-                    {value.documents.length > 0 && <div className="flex flex-col space-y-2 border-t border-gray-600">
-                        {value.documents.map(value => (
-                            <div key={`document-${value.filename}`} className="flex items-center mt-4 space-x-2">
-                                <a href={`http://localhost:8080/files/${value.filename}`} target="_blank"
-                                   rel="noreferrer"
-                                   className="text-blue-500 hover:text-blue-700">
-                                    <FontAwesomeIcon icon={regular("file")} className="mr-2"/>
-                                    {value.originalName}
-                                </a>
-                            </div>
-                        ))}
-                    </div>}
+                    {value.documents.length > 0 &&
+                        <div className="flex flex-col space-y-2 border-t border-gray-600">
+                            {value.documents.map(value => (
+                                <div key={`document-${value.filename}`}
+                                     className="flex items-center mt-4 space-x-2">
+                                    <a href={`http://localhost:8080/files/${value.filename}`} target="_blank"
+                                       rel="noreferrer"
+                                       className="text-blue-500 hover:text-blue-700">
+                                        <FontAwesomeIcon icon={regular("file")} className="mr-2"/>
+                                        {value.originalName}
+                                    </a>
+                                </div>
+                            ))}
+                        </div>}
                     <div className="flex justify-between items-center pt-2 border-t border-gray-600 text-gray-600">
                         <span><FontAwesomeIcon icon={regular("user")} className="mr-1"/>{value.authorName}</span>
-                        <span><FontAwesomeIcon icon={regular("clock")} className="mr-1"/> {new Date(value.createdAt).toLocaleString()}</span>
+                        <span><FontAwesomeIcon icon={regular("clock")}
+                                               className="mr-1"/> {new Date(value.createdAt).toLocaleString()}</span>
                     </div>
                 </div>
             ))}

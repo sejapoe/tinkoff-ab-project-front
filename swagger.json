@@ -209,8 +209,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Корневой раздел",
+          "404": {
+            "description": "Корневой раздел отсутствует",
             "content": {
               "*/*": {
                 "schema": {
@@ -219,8 +219,8 @@
               }
             }
           },
-          "404": {
-            "description": "Корневой раздел отсутствует",
+          "200": {
+            "description": "Корневой раздел",
             "content": {
               "*/*": {
                 "schema": {
@@ -1164,6 +1164,9 @@
           "account_id": {
             "type": "integer",
             "format": "int64"
+          },
+          "username": {
+            "type": "string"
           },
           "token": {
             "type": "string"
