@@ -4,6 +4,7 @@ import {useQueryClient} from "@tanstack/react-query";
 import {sectionKeys} from "../features/section/api";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {solid} from "@fortawesome/fontawesome-svg-core/import.macro";
+import clsx from "clsx";
 
 export const MainLayout = () => {
     const location = useLocation();
@@ -25,7 +26,10 @@ export const MainLayout = () => {
 
     return (
         <div className="w-screen h-[90vh]">
-            <div className="w-full h-8 shadow flex justify-between items-center">
+            <div className={clsx(
+                "w-full h-12 shadow flex justify-between items-center",
+                user && (user.roles.includes("ROLE_ADMIN") ? "bg-red-300" : "bg-cyan-300")
+            )}>
                 <div className="mx-4 text-xl text-blue-700 cursor-pointer" onClick={() => nav("/")}>
                     <FontAwesomeIcon icon={solid("home")}/>
                 </div>

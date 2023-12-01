@@ -154,6 +154,7 @@ export interface JwtResponseDto {
     account_id?: number;
     username?: string;
     token?: string;
+    roles?: string[];
 }
 
 export interface JwtRequestDto {
@@ -179,6 +180,7 @@ export interface AccountResponseDto {
     description?: string;
     gender?: "NOT_SPECIFIED" | "MALE" | "FEMALE" | "APACHE_HELICOPTER";
     avatar?: DocumentResponseDto;
+    enabled?: boolean;
 }
 
 export interface PageResponseDtoPostResponseDto {
@@ -200,6 +202,18 @@ export interface TopicResponseDto {
     id?: number;
     name?: string;
     posts?: PageResponseDtoPostResponseDto;
+}
+
+export interface PageResponseDtoAccountResponseDto {
+    /** @format int32 */
+    number?: number;
+    /** @format int32 */
+    size?: number;
+    /** @format int32 */
+    totalPages?: number;
+    /** @format int64 */
+    totalElements?: number;
+    content?: AccountResponseDto[];
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -756,30 +770,80 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     };
     account = {
         /**
-         * No description
+         * @description Редактирование аккаунта
          *
          * @tags account
          * @name UpdateAccount
          * @request PATCH:/account/
+         * @secure
          */
         updateAccount: (data: UpdateAccountRequestDto, params: RequestParams = {}) =>
-            this.request<AccountResponseDto, any>({
+            this.request<AccountResponseDto, AccountResponseDto>({
                 path: `/account/`,
                 method: "PATCH",
                 body: data,
+                secure: true,
                 type: ContentType.FormData,
                 ...params,
             }),
 
         /**
-         * No description
+         * @description Получение всех аккаунтов
          *
          * @tags account
-         * @name GetAccount
+         * @name GetAll
+         * @request GET:/account
+         * @secure
+         */
+        getAll: (
+            query?: {
+                /** @format int32 */
+                pageNumber?: number;
+                /** @format int32 */
+                forPage?: number;
+            },
+            params: RequestParams = {},
+        ) =>
+            this.request<PageResponseDtoAccountResponseDto, PageResponseDtoAccountResponseDto>({
+                path: `/account`,
+                method: "GET",
+                query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Удаление аккаунта
+         *
+         * @tags account
+         * @name Delete2
+         * @request DELETE:/account
+         * @secure
+         */
+        delete2: (
+            query: {
+                /** @format int64 */
+                id: number;
+            },
+            params: RequestParams = {},
+        ) =>
+            this.request<number, number>({
+                path: `/account`,
+                method: "DELETE",
+                query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Получение аккаунта
+         *
+         * @tags account
+         * @name Get2
          * @request GET:/account/{id}
          */
-        getAccount: (id: number, params: RequestParams = {}) =>
-            this.request<AccountResponseDto, any>({
+        get2: (id: number, params: RequestParams = {}) =>
+            this.request<AccountResponseDto, AccountResponseDto>({
                 path: `/account/${id}`,
                 method: "GET",
                 ...params,

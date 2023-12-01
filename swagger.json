@@ -16,10 +16,6 @@
       "description": "Работа с топиками"
     },
     {
-      "name": "account",
-      "description": "Авторизация на сайте"
-    },
-    {
       "name": "section",
       "description": "Работа с разделами"
     },
@@ -30,6 +26,10 @@
     {
       "name": "post",
       "description": "Работа с постами"
+    },
+    {
+      "name": "account",
+      "description": "Работа с аккаунтами"
     }
   ],
   "paths": {
@@ -252,22 +252,22 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Неправильный формат данных",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ShortSectionResponseDto"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Раздел обновлен",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/SectionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неправильный формат данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShortSectionResponseDto"
                 }
               }
             }
@@ -363,8 +363,8 @@
               }
             }
           },
-          "200": {
-            "description": "Пост создан",
+          "404": {
+            "description": "Пост не найден",
             "content": {
               "*/*": {
                 "schema": {
@@ -373,8 +373,8 @@
               }
             }
           },
-          "404": {
-            "description": "Пост не найден",
+          "200": {
+            "description": "Пост найден",
             "content": {
               "*/*": {
                 "schema": {
@@ -639,6 +639,7 @@
         "tags": [
           "account"
         ],
+        "description": "Редактирование аккаунта",
         "operationId": "updateAccount",
         "requestBody": {
           "content": {
@@ -650,8 +651,28 @@
           }
         },
         "responses": {
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Аккаунт не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          },
           "200": {
-            "description": "OK",
+            "description": "Аккаунт изменен",
             "content": {
               "*/*": {
                 "schema": {
@@ -660,7 +681,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          }
+        ]
       }
     },
     "/topic/{id}": {
@@ -881,12 +907,127 @@
         }
       }
     },
+    "/account": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "description": "Получение всех аккаунтов",
+        "operationId": "getAll",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "forPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseDtoAccountResponseDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Аккаунт найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseDtoAccountResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "account"
+        ],
+        "description": "Удаление аккаунта",
+        "operationId": "delete_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Аккаунт удален",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Аккаунт не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          }
+        ]
+      }
+    },
     "/account/{id}": {
       "get": {
         "tags": [
           "account"
         ],
-        "operationId": "getAccount",
+        "description": "Получение аккаунта",
+        "operationId": "get_2",
         "parameters": [
           {
             "name": "id",
@@ -899,8 +1040,28 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          },
           "200": {
-            "description": "OK",
+            "description": "Аккаунт найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Аккаунт не найден",
             "content": {
               "*/*": {
                 "schema": {
@@ -1243,6 +1404,12 @@
           },
           "token": {
             "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -1315,6 +1482,9 @@
           },
           "avatar": {
             "$ref": "#/components/schemas/DocumentResponseDto"
+          },
+          "enabled": {
+            "type": "boolean"
           }
         }
       },
@@ -1361,6 +1531,33 @@
           },
           "posts": {
             "$ref": "#/components/schemas/PageResponseDtoPostResponseDto"
+          }
+        }
+      },
+      "PageResponseDtoAccountResponseDto": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountResponseDto"
+            }
           }
         }
       }

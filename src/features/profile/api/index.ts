@@ -20,7 +20,7 @@ export const useAccount = (id: number, params?: RequestParams) =>
     useQuery<Account, GenericErrorModel, Account, unknown[]>({
         queryKey: accountKeys.account.byId(id),
         queryFn: async ({signal}) => {
-            const response = await api.account.getAccount(id, {
+            const response = await api.account.get2(id, {
                 signal,
                 ...params
             })
@@ -32,7 +32,7 @@ export const useAccount = (id: number, params?: RequestParams) =>
 
 export type UseUpdateAccountMutation = UseMutationOptions<Account, GenericErrorModel, UpdateAccountRequestDto, unknown[]>
 
-type UseUpdateAccountOptions = Omit<Section, 'mutationFn' | 'mutationKey'>
+type UseUpdateAccountOptions = Omit<UseUpdateAccountMutation, 'mutationFn' | 'mutationKey'>
 
 export const useUpdateAccount = (options?: UseUpdateAccountOptions) =>
     useMutation<Account, GenericErrorModel, UpdateAccountRequestDto, unknown[]>({

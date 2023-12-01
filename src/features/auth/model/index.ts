@@ -6,6 +6,7 @@ type User = {
     id: number;
     username: string;
     token: string;
+    roles: string[];
 };
 
 type SessionState = {
