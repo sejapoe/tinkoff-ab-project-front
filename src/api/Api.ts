@@ -303,7 +303,7 @@ export class HttpClient<SecurityDataType = unknown> {
         [ContentType.FormData]: (input: any) =>
             Object.keys(input || {}).reduce((formData, key) => {
                 const property = input[key];
-                if (!property) return formData;
+                if (property === null || property === undefined) return formData;
 
                 if (Array.isArray(property) && property.every(item => item instanceof File)) {
                     property.forEach(value => {
