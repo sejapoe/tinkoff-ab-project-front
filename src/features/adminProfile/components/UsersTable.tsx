@@ -9,6 +9,7 @@ import {useQueryClient} from "@tanstack/react-query";
 import clsx from "clsx";
 import {useCurrentUser} from "../../auth/model";
 import {Link} from "react-router-dom";
+import {UniversalPaginationController} from "../../../ui/pageable/UniversalPaginationController";
 
 type ActionsProps = {
     account: Account
@@ -71,6 +72,9 @@ const UsersTableContent = ({accounts}: UsersTableContentProps) => {
             </tr>))}
             </tbody>
         </table>
+        <div className="w-full flex justify-center">
+            <UniversalPaginationController totalPages={accounts.totalPages}/>
+        </div>
     </div>
 }
 

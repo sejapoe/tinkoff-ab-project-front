@@ -12,7 +12,8 @@ export const topicKeys = {
         byQuery: (query: UseTopicQuery) => [...topicKeys.topics.root, query]
     },
     mutations: {
-        createTopic: (sectionId: number) => [...topicKeys.topics.byId(sectionId), 'createTopic']
+        createTopic: (sectionId: number) => [...topicKeys.topics.byId(sectionId), 'createTopic'],
+        deleteTopic: () => [...topicKeys.topics.root, 'delete']
     }
 }
 
@@ -30,7 +31,7 @@ export const useTopic = (query: UseTopicQuery, params?: RequestParams) =>
                     signal,
                     ...params
                 })
-            
+
             return mapTopicWithPosts(response.data)
         }
     })
@@ -47,6 +48,25 @@ export const useCreateTopic = (sectionId: number, options?: UseCreateTopicOption
             const response = await api.topic.create(dto)
 
             return mapTopic(response.data)
+        },
+        ...options
+    })
+
+
+// ---------------------------------------------------------
+// -------------          admin         --------------------
+// ---------------------------------------------------------
+
+
+export type UseDeleteTopicMutation = UseMutationOptions<void, GenericErrorModel, number, unknown[]>
+
+type UseDeleteTopicOptions = Omit<UseDeleteTopicMutation, 'mutationFn' | 'mutationKey'>
+
+export const useDeleteTopic = (options?: UseDeleteTopicOptions) =>
+    useMutation<void, GenericErrorModel, number, unknown[]>({
+        mutationKey: topicKeys.mutations.deleteTopic(),
+        mutationFn: async (id) => {
+            await api.topic.delete({id})
         },
         ...options
     })

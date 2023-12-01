@@ -1,10 +1,10 @@
 import {Topic, TopicWithPosts} from "../model";
-import {Link, useParams} from "react-router-dom";
-import {topicKeys, useTopic} from "../api";
+import {Link, useNavigate, useParams} from "react-router-dom";
+import {topicKeys, useDeleteTopic, useTopic} from "../api";
 import {regular, solid} from "@fortawesome/fontawesome-svg-core/import.macro";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useRef, useState} from "react";
-import {useCreatePost} from "../../post/api";
+import {useCreatePost, useDeletePost} from "../../post/api";
 import {useQueryClient} from "@tanstack/react-query";
 import Pageable from "../../../ui/pageable/Pageable";
 import {UniversalPaginationController} from "../../../ui/pageable/UniversalPaginationController";
@@ -92,7 +92,19 @@ const TopicComponent = ({
                             topic
                         }: TopicComponentProps
 ) => {
+    const queryClient = useQueryClient()
     const user = useCurrentUser()
+    const nav = useNavigate()
+    const {mutate: deleteTopic} = useDeleteTopic({
+        onSuccess: () => {
+            nav(`/sections/${topic.parentId}`)
+        }
+    })
+    const {mutate: deletePost} = useDeletePost({
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({queryKey: topicKeys.topics.root})
+        }
+    })
 
     return <div className="px-8">
         <Link to={`/sections/${topic.parentId}`} className="text-xl text-blue-500 hover:text-blue-700">
@@ -102,6 +114,11 @@ const TopicComponent = ({
             <p className="text-3xl text-black">
                 {topic.name}
             </p>
+            {user?.roles.includes("ROLE_ADMIN") &&
+                <FontAwesomeIcon icon={solid("trash")}
+                                 className="text-xl text-yellow-600 hover:text-yellow-800 cursor-pointer"
+                                 onClick={() => deleteTopic(topic.id)}/>
+            }
         </div>
         <div className="mt-4 space-y-4 w-1/2">
             {topic.posts.content.map(value => (
@@ -113,7 +130,8 @@ const TopicComponent = ({
                             {value.documents.map(value => (
                                 <div key={`document-${value.filename}`}
                                      className="flex items-center mt-4 space-x-2">
-                                    <a href={`http://localhost:8080/files/${value.filename}`} target="_blank"
+                                    <a href={`http://localhost:8080/files/${value.filename}`}
+                                       target="_blank"
                                        rel="noreferrer"
                                        className="text-blue-500 hover:text-blue-700">
                                         <FontAwesomeIcon icon={regular("file")} className="mr-2"/>
@@ -137,7 +155,14 @@ const TopicComponent = ({
                         <span>
                             <FontAwesomeIcon icon={regular("clock")} className="mr-2"/>
                             {new Date(value.createdAt).toLocaleString()}
+                            {
+                                user?.roles.includes("ROLE_ADMIN") &&
+                                <FontAwesomeIcon icon={solid("trash")}
+                                                 className="ml-2 text-yellow-600 hover:text-yellow-800 cursor-pointer"
+                                                 onClick={() => deletePost(value.id)}/>
+                            }
                         </span>
+
                     </div>
                 </div>
             ))}
