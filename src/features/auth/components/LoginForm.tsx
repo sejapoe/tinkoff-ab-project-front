@@ -1,7 +1,8 @@
-import {useNavigate} from "react-router-dom";
+import {Navigate, useNavigate, useSearchParams} from "react-router-dom";
 import {useLogin} from "../api";
 import {useForm} from "react-hook-form";
 import {InputField} from "../../../ui/form/InputField";
+import {useCurrentUser} from "../model";
 
 type LoginValues = {
     name: string;
@@ -10,16 +11,19 @@ type LoginValues = {
 
 
 export const LoginForm = () => {
+    const [queryParams] = useSearchParams()
     const nav = useNavigate()
     const {mutate} = useLogin();
     const {register, handleSubmit, formState} = useForm<LoginValues>()
+
+    const redirectTo = queryParams.get("redirect_uri") || "/"
 
     return (
         <div className="w-full h-full rounded flex justify-center items-center">
             <form className="p-8 flex flex-col shadow space-y-6" onSubmit={handleSubmit(data => {
                 mutate(data, {
                     onSuccess: () => {
-                        nav(-1)
+                        nav(redirectTo)
                     },
                     onError: err => alert(err.error.detail)
                 })

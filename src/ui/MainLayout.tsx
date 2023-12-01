@@ -1,4 +1,4 @@
-import {Outlet, useNavigate} from "react-router-dom";
+import {Outlet, useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import {deleteToken, useCurrentUser} from "../features/auth/model";
 import {useQueryClient} from "@tanstack/react-query";
 import {sectionKeys} from "../features/section/api";
@@ -6,9 +6,22 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {solid} from "@fortawesome/fontawesome-svg-core/import.macro";
 
 export const MainLayout = () => {
+    const location = useLocation();
+    const [search] = useSearchParams()
     const nav = useNavigate()
     const queryClient = useQueryClient()
     const user = useCurrentUser()
+
+    function navWithRedirect(basePath: string) {
+        let path = basePath
+        if (location.pathname === "/login" || location.pathname === "/signup") {
+            const redirectUri = search.get("redirect_uri")
+            if (redirectUri) path += `?redirect_uri=${redirectUri}`
+        } else {
+            path += `?redirect_uri=${location.pathname}`
+        }
+        nav(path)
+    }
 
     return (
         <div className="w-screen h-[90vh]">
@@ -33,11 +46,15 @@ export const MainLayout = () => {
                             </div>
 
                             : <div className="mx-4 space-x-2">
-                                <button onClick={() => nav("/login")}
+                                <button onClick={() => {
+                                    navWithRedirect("/login")
+                                }}
                                         className="hover:text-cyan-700 text-blue-700">
                                     Войти
                                 </button>
-                                <button onClick={() => nav("/signup")}
+                                <button onClick={() => {
+                                    navWithRedirect("/signup");
+                                }}
                                         className="hover:text-cyan-700 text-blue-700">
                                     Регистрация
                                 </button>

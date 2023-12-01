@@ -1,12 +1,10 @@
 import {Account, Gender} from "../model";
 import {useCurrentUser} from "../../auth/model";
-import {Avatar} from "./Avatar";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {solid} from "@fortawesome/fontawesome-svg-core/import.macro";
 import {accountKeys, useAccount, useUpdateAccount} from "../api";
-import {Navigate, useNavigate} from "react-router-dom";
+import {Navigate, useLocation, useNavigate} from "react-router-dom";
 import React, {useState} from "react";
 import {useQueryClient} from "@tanstack/react-query";
+import {getPathWithRedirect} from "../../../utils/routes";
 
 const genderL10n: {
     [P in Gender]: string
@@ -97,9 +95,10 @@ const ProfileEditLoader = ({id}: { id: number }) => {
 }
 
 export const ProfileEdit = () => {
+    const location = useLocation()
     const user = useCurrentUser()
 
-    if (!user) return <Navigate to="/login"/>;
+    if (!user) return <Navigate to={getPathWithRedirect("/login", location)}/>;
 
     return <ProfileEditLoader id={user.id}/>
 };

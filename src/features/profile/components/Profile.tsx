@@ -2,10 +2,11 @@ import React from 'react';
 import {useAccount} from "../api";
 import {Account, Gender} from "../model";
 import {Avatar} from "./Avatar";
-import {Link, Navigate, useNavigate, useParams} from "react-router-dom";
+import {Link, Navigate, useLocation, useNavigate, useParams} from "react-router-dom";
 import {useCurrentUser} from "../../auth/model";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {solid} from "@fortawesome/fontawesome-svg-core/import.macro";
+import {getPathWithRedirect} from "../../../utils/routes";
 
 const genderL10n: {
     [P in Gender]: string
@@ -67,10 +68,11 @@ const ProfileLoader = ({id}: { id: number }) => {
 }
 
 export const Profile = () => {
+    const location = useLocation()
     const user = useCurrentUser()
     const {id} = useParams()
 
-    if (!user && !id) return <Navigate to="/login"/>;
+    if (!user && !id) return <Navigate to={getPathWithRedirect(`/login`, location)}/>;
 
     return <ProfileLoader id={
         parseInt(id || user!.id.toString())
