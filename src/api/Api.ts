@@ -68,6 +68,7 @@ export interface UpdatePostRequestDto {
     parent_id: number;
     /** @format int64 */
     author_id: number;
+    is_anonymous?: boolean;
     /** @format int64 */
     id: number;
     /**
@@ -88,6 +89,7 @@ export interface DocumentResponseDto {
 export interface PostResponseDto {
     /** @format int64 */
     parent_id?: number;
+    is_author?: boolean;
     /** @format int64 */
     author_id?: number;
     author_name?: string;
@@ -138,6 +140,7 @@ export interface CreatePostRequestDto {
      * @minItems 0
      */
     files?: File[];
+    isAnonymous?: boolean;
 }
 
 export interface SignUpRequestDto {
@@ -156,6 +159,26 @@ export interface JwtResponseDto {
 export interface JwtRequestDto {
     name?: string;
     password?: string;
+}
+
+export interface UpdateAccountRequestDto {
+    /** @format int64 */
+    id?: number;
+    name: string;
+    description?: string;
+    gender?: "NOT_SPECIFIED" | "MALE" | "FEMALE" | "APACHE_HELICOPTER";
+    /** @format binary */
+    avatar?: File;
+}
+
+export interface AccountResponseDto {
+    /** @format int64 */
+    id?: number;
+    name?: string;
+    displayName?: string;
+    description?: string;
+    gender?: "NOT_SPECIFIED" | "MALE" | "FEMALE" | "APACHE_HELICOPTER";
+    avatar?: DocumentResponseDto;
 }
 
 export interface PageResponseDtoPostResponseDto {
@@ -280,6 +303,7 @@ export class HttpClient<SecurityDataType = unknown> {
         [ContentType.FormData]: (input: any) =>
             Object.keys(input || {}).reduce((formData, key) => {
                 const property = input[key];
+                if (!property) return formData;
 
                 if (Array.isArray(property) && property.every(item => item instanceof File)) {
                     property.forEach(value => {
@@ -727,6 +751,37 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: "POST",
                 body: data,
                 type: ContentType.Json,
+                ...params,
+            }),
+    };
+    account = {
+        /**
+         * No description
+         *
+         * @tags account
+         * @name UpdateAccount
+         * @request PATCH:/account/
+         */
+        updateAccount: (data: UpdateAccountRequestDto, params: RequestParams = {}) =>
+            this.request<AccountResponseDto, any>({
+                path: `/account/`,
+                method: "PATCH",
+                body: data,
+                type: ContentType.FormData,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags account
+         * @name GetAccount
+         * @request GET:/account/{id}
+         */
+        getAccount: (id: number, params: RequestParams = {}) =>
+            this.request<AccountResponseDto, any>({
+                path: `/account/${id}`,
+                method: "GET",
                 ...params,
             }),
     };

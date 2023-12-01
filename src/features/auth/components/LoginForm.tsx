@@ -15,7 +15,7 @@ export const LoginForm = () => {
     const {register, handleSubmit, formState} = useForm<LoginValues>()
 
     return (
-        <div className="w-screen h-full rounded flex justify-center items-center">
+        <div className="w-full h-full rounded flex justify-center items-center">
             <form className="p-8 flex flex-col shadow space-y-6" onSubmit={handleSubmit(data => {
                 mutate(data, {
                     onSuccess: () => {

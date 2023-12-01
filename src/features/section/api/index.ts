@@ -54,7 +54,7 @@ export const useRootSection = (page: PageRequest, params?: RequestParams) =>
 
 export type UseCreateSectionMutation = UseMutationOptions<Section, GenericErrorModel, CreateSectionRequestDto, unknown[]>
 
-type UseCreateSectionOptions = Omit<Section, 'mutationFn' | 'mutationKey'>
+type UseCreateSectionOptions = Omit<UseCreateSectionMutation, 'mutationFn' | 'mutationKey'>
 
 export const useCreateSection = (options?: UseCreateSectionOptions) =>
     useMutation<Section, GenericErrorModel, CreateSectionRequestDto, unknown[]>({

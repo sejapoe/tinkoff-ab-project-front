@@ -16,6 +16,10 @@
       "description": "Работа с топиками"
     },
     {
+      "name": "account",
+      "description": "Авторизация на сайте"
+    },
+    {
       "name": "section",
       "description": "Работа с разделами"
     },
@@ -209,8 +213,8 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Корневой раздел отсутствует",
+          "200": {
+            "description": "Корневой раздел",
             "content": {
               "*/*": {
                 "schema": {
@@ -219,8 +223,8 @@
               }
             }
           },
-          "200": {
-            "description": "Корневой раздел",
+          "404": {
+            "description": "Корневой раздел отсутствует",
             "content": {
               "*/*": {
                 "schema": {
@@ -248,22 +252,22 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Раздел обновлен",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SectionResponseDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Неправильный формат данных",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ShortSectionResponseDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Раздел обновлен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectionResponseDto"
                 }
               }
             }
@@ -630,6 +634,35 @@
         }
       }
     },
+    "/account/": {
+      "patch": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "updateAccount",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/topic/{id}": {
       "get": {
         "tags": [
@@ -847,6 +880,37 @@
           }
         }
       }
+    },
+    "/account/{id}": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "getAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -994,6 +1058,9 @@
             "type": "integer",
             "format": "int64"
           },
+          "is_anonymous": {
+            "type": "boolean"
+          },
           "id": {
             "type": "integer",
             "format": "int64"
@@ -1033,6 +1100,9 @@
           "parent_id": {
             "type": "integer",
             "format": "int64"
+          },
+          "is_author": {
+            "type": "boolean"
           },
           "author_id": {
             "type": "integer",
@@ -1141,6 +1211,9 @@
               "type": "string",
               "format": "binary"
             }
+          },
+          "isAnonymous": {
+            "type": "boolean"
           }
         }
       },
@@ -1181,6 +1254,67 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "UpdateAccountRequestDto": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "NOT_SPECIFIED",
+              "MALE",
+              "FEMALE",
+              "APACHE_HELICOPTER"
+            ]
+          },
+          "avatar": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "AccountResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "NOT_SPECIFIED",
+              "MALE",
+              "FEMALE",
+              "APACHE_HELICOPTER"
+            ]
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/DocumentResponseDto"
           }
         }
       },

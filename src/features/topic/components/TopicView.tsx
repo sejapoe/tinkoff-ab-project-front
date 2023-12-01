@@ -20,6 +20,8 @@ const CreateForm = ({parentId}: CreateFormProps) => {
     const queryClient = useQueryClient()
     const [files, setFiles] = useState<File[]>([])
     const [text, setText] = useState("")
+    const [isAnonymous, setAnonymous] = useState(false)
+
     const formRef = useRef<HTMLFormElement>(null)
     const {mutate} = useCreatePost(parentId)
 
@@ -29,27 +31,17 @@ const CreateForm = ({parentId}: CreateFormProps) => {
             e.preventDefault()
             if (text === "") return alert("Заполните все обязательные поля")
 
-            console.log(files.map(file => file.size))
-
             if (files.some(file => file.size > MAX_FILE_SIZE)
                 || files.reduce((partSum: number, file: File) => partSum + file.size, 0) > MAX_SUMMARY_FILE_SIZE) {
                 return alert("Размер файлов превышает лимит");
             }
-
-            console.log(
-                {
-                    parentId,
-                    authorId: user?.id || -1,
-                    text,
-                    files,
-                }
-            )
 
             mutate({
                 parentId,
                 authorId: user?.id || -1,
                 text,
                 files,
+                isAnonymous,
             }, {
                 onSuccess: async () => {
                     setText("")
@@ -76,6 +68,14 @@ const CreateForm = ({parentId}: CreateFormProps) => {
                multiple
                onChange={e => setFiles(e.target.files ? Array.from(e.target.files) : [])}
         />
+
+        <label>
+            <input type="checkbox"
+                   checked={isAnonymous}
+                   onChange={e => setAnonymous(e.target.checked)}
+            />
+            Опубликовать анонимно
+        </label>
 
         <button type={"submit"}
                 className="px-4 py-2 border border-blue-500 text-blue-500 hover:border-blue-700 bg-white rounded-md w-full">
@@ -123,9 +123,21 @@ const TopicComponent = ({
                             ))}
                         </div>}
                     <div className="flex justify-between items-center pt-2 border-t border-gray-600 text-gray-600">
-                        <span><FontAwesomeIcon icon={regular("user")} className="mr-1"/>{value.authorName}</span>
-                        <span><FontAwesomeIcon icon={regular("clock")}
-                                               className="mr-1"/> {new Date(value.createdAt).toLocaleString()}</span>
+                        {
+                            value.authorId === -1
+                                ? <span className="text-lg">
+                                    <FontAwesomeIcon icon={solid("user-secret")} className="mr-1"/>
+                                    {value.authorName}{value.isAuthor ? " (Вы)" : ""}
+                                </span>
+                                : <Link to={`/profile/${value.authorId}`} className="text-blue-700">
+                                    <FontAwesomeIcon icon={solid("user")} className="mr-2"/>
+                                    {value.authorName}{value.isAuthor ? " (Вы)" : ""}
+                                </Link>
+                        }
+                        <span>
+                            <FontAwesomeIcon icon={regular("clock")} className="mr-2"/>
+                            {new Date(value.createdAt).toLocaleString()}
+                        </span>
                     </div>
                 </div>
             ))}
