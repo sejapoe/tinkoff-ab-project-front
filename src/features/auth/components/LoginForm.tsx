@@ -25,7 +25,7 @@ export const LoginForm = () => {
                     onSuccess: () => {
                         nav(redirectTo)
                     },
-                    onError: err => alert(err.error.detail)
+                    onError: err => alert(err.error.detail || "Ошибка")
                 })
             })}>
                 <InputField label="Имя пользователя" error={formState.errors["name"]}

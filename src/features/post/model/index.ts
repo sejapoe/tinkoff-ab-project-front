@@ -16,6 +16,7 @@ export type Post = {
     parentId: number;
     createdAt: string;
     isAuthor: boolean;
+    isAnonymous: boolean;
     authorId: number
     authorName: string;
     documents: Document[]
@@ -27,6 +28,7 @@ export const mapPost = (dto: PostResponseDto): Post => ({
     parentId: dto?.parent_id || -1,
     createdAt: dto?.created_at || "",
     isAuthor: dto?.is_author || false,
+    isAnonymous: dto?.is_anonymous || false,
     authorId: dto?.author_id || -1,
     authorName: dto?.author_name || "",
     documents: dto?.documents?.map(mapDocument) || [],

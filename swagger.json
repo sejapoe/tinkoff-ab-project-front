@@ -20,8 +20,16 @@
       "description": "Работа с разделами"
     },
     {
+      "name": "news",
+      "description": "Работа с новостями"
+    },
+    {
       "name": "auth",
       "description": "Авторизация на сайте"
+    },
+    {
+      "name": "settings",
+      "description": "Настройки приложения"
     },
     {
       "name": "post",
@@ -33,18 +41,17 @@
     }
   ],
   "paths": {
-    "/topic": {
+    "/settings/job": {
       "put": {
         "tags": [
-          "topic"
+          "settings"
         ],
-        "description": "Обновление топика",
-        "operationId": "update",
+        "operationId": "updateTrigger",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateTopicRequestDto"
+                "$ref": "#/components/schemas/UpdateTriggerRequestDto"
               }
             }
           },
@@ -52,42 +59,173 @@
         },
         "responses": {
           "200": {
-            "description": "Топик обновлен",
+            "description": "OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ShortTopicResponseDto"
+                  "$ref": "#/components/schemas/TriggerResponseDto"
                 }
               }
             }
-          },
+          }
+        }
+      }
+    },
+    "/post": {
+      "get": {
+        "tags": [
+          "post"
+        ],
+        "description": "Получение поста",
+        "operationId": "get_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
           "400": {
             "description": "Неверный формат данных",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ShortTopicResponseDto"
+                  "$ref": "#/components/schemas/PostResponseDto"
                 }
               }
             }
           },
           "404": {
-            "description": "Топик не найден",
+            "description": "Пост не найден",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ShortTopicResponseDto"
+                  "$ref": "#/components/schemas/PostResponseDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Пост найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResponseDto"
                 }
               }
             }
           }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          }
-        ]
+        }
       },
+      "put": {
+        "tags": [
+          "post"
+        ],
+        "description": "Обновление поста",
+        "operationId": "update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePostRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResponseDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Пост обновлен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пост не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "post"
+        ],
+        "description": "Удаление своего поста",
+        "operationId": "delete_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Пост удален",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пост не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topic": {
       "post": {
         "tags": [
           "topic"
@@ -177,12 +315,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          }
-        ]
+        }
       }
     },
     "/sections": {
@@ -229,55 +362,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/SectionResponseDto"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "section"
-        ],
-        "description": "Обновление раздела",
-        "operationId": "updateSection",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateSectionRequestDto"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Раздел обновлен",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SectionResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Неправильный формат данных",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ShortSectionResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Родительский раздел не найден",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ShortSectionResponseDto"
                 }
               }
             }
@@ -334,170 +418,6 @@
         }
       }
     },
-    "/post": {
-      "get": {
-        "tags": [
-          "post"
-        ],
-        "description": "Получение поста",
-        "operationId": "get_1",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Неверный формат данных",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PostResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Пост не найден",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PostResponseDto"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Пост найден",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PostResponseDto"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "post"
-        ],
-        "description": "Обновление поста",
-        "operationId": "update_1",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePostRequestDto"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "400": {
-            "description": "Неверный формат данных",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PostResponseDto"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Пост обновлен",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PostResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Пост не найден",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PostResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "post"
-        ],
-        "description": "Удаление поста",
-        "operationId": "delete_1",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Неверный формат данных",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Пост удален",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Пост не найден",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          }
-        ]
-      }
-    },
     "/post/withattach": {
       "post": {
         "tags": [
@@ -535,12 +455,135 @@
               }
             }
           }
-        },
-        "security": [
+        }
+      }
+    },
+    "/news": {
+      "get": {
+        "tags": [
+          "news"
+        ],
+        "operationId": "getAllNews",
+        "parameters": [
           {
-            "bearerToken": []
+            "name": "pageNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "forPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseDtoShortNewsResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "news"
+        ],
+        "description": "Создание новости",
+        "operationId": "createNews",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewsRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/comments": {
+      "post": {
+        "tags": [
+          "news"
+        ],
+        "operationId": "createComment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewsCommentRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsCommentResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/comments/thread": {
+      "post": {
+        "tags": [
+          "news"
+        ],
+        "operationId": "createComment_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentInThreadRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResponseDto"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/files": {
@@ -634,6 +677,70 @@
         }
       }
     },
+    "/account/{id}/promote": {
+      "patch": {
+        "tags": [
+          "account"
+        ],
+        "description": "Повышение пользователя",
+        "operationId": "promote",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/{id}/demote": {
+      "patch": {
+        "tags": [
+          "account"
+        ],
+        "description": "Повышение пользователя",
+        "operationId": "demote",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/account/": {
       "patch": {
         "tags": [
@@ -681,12 +788,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          }
-        ]
+        }
       }
     },
     "/topic/{id}": {
@@ -822,7 +924,7 @@
         "tags": [
           "section"
         ],
-        "description": "Обновление раздела",
+        "description": "Удаление раздела",
         "operationId": "deleteSection",
         "parameters": [
           {
@@ -841,6 +943,135 @@
           },
           "404": {
             "description": "Раздел не найден"
+          }
+        }
+      }
+    },
+    "/news/{newsId}": {
+      "get": {
+        "tags": [
+          "news"
+        ],
+        "operationId": "getNews",
+        "parameters": [
+          {
+            "name": "newsId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/{newsId}/comments": {
+      "get": {
+        "tags": [
+          "news"
+        ],
+        "operationId": "getComments",
+        "parameters": [
+          {
+            "name": "newsId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "forPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseDtoNewsCommentResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/comments/{threadId}": {
+      "get": {
+        "tags": [
+          "news"
+        ],
+        "operationId": "getThreadComments",
+        "parameters": [
+          {
+            "name": "threadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "forPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseDtoPostResponseDto"
+                }
+              }
+            }
           }
         }
       }
@@ -955,12 +1186,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          }
-        ]
+        }
       },
       "delete": {
         "tags": [
@@ -1013,12 +1239,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          }
-        ]
+        }
       }
     },
     "/account/{id}": {
@@ -1072,28 +1293,223 @@
           }
         }
       }
+    },
+    "/post/admin": {
+      "delete": {
+        "tags": [
+          "post"
+        ],
+        "description": "Удаление поста администратором",
+        "operationId": "deleteAdmin",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Пост удален",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пост не найден",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
-      "UpdateTopicRequestDto": {
+      "UpdateTriggerRequestDto": {
         "required": [
-          "id",
-          "name",
-          "parentId"
+          "cron",
+          "group",
+          "trigger_key"
         ],
         "type": "object",
         "properties": {
+          "trigger_key": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "cron": {
+            "type": "string"
+          }
+        }
+      },
+      "TriggerResponseDto": {
+        "type": "object",
+        "properties": {
+          "trigger_key": {
+            "type": "string"
+          },
+          "job_key": {
+            "type": "string"
+          },
+          "cron": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdatePostRequestDto": {
+        "required": [
+          "author_id",
+          "id",
+          "parent_id",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "parent_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "author_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "is_anonymous": {
+            "type": "boolean"
+          },
           "id": {
             "type": "integer",
             "format": "int64"
           },
+          "text": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "DocumentResponseDto": {
+        "type": "object",
+        "properties": {
+          "original_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "FILE",
+              "IMAGE"
+            ]
+          }
+        }
+      },
+      "PostResponseDto": {
+        "type": "object",
+        "properties": {
+          "parent_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "is_author": {
+            "type": "boolean"
+          },
+          "is_anonymous": {
+            "type": "boolean"
+          },
+          "author_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "author_name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "text": {
+            "type": "string"
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentResponseDto"
+            }
+          }
+        }
+      },
+      "CreateTopicRequestDto": {
+        "required": [
+          "authorId",
+          "name",
+          "parentId",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
           "parentId": {
             "type": "integer",
             "format": "int64"
           },
           "name": {
             "type": "string"
+          },
+          "authorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "text": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "files": {
+            "maxItems": 5,
+            "minItems": 0,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            }
           }
         }
       },
@@ -1109,14 +1525,14 @@
           }
         }
       },
-      "UpdateSectionRequestDto": {
+      "CreateSectionRequestDto": {
         "required": [
-          "id",
-          "name"
+          "name",
+          "parent_id"
         ],
         "type": "object",
         "properties": {
-          "id": {
+          "parent_id": {
             "type": "integer",
             "format": "int64"
           },
@@ -1202,147 +1618,6 @@
           }
         }
       },
-      "UpdatePostRequestDto": {
-        "required": [
-          "author_id",
-          "id",
-          "parent_id",
-          "text"
-        ],
-        "type": "object",
-        "properties": {
-          "parent_id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "author_id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "is_anonymous": {
-            "type": "boolean"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "text": {
-            "maxLength": 200,
-            "minLength": 0,
-            "type": "string"
-          }
-        }
-      },
-      "DocumentResponseDto": {
-        "type": "object",
-        "properties": {
-          "original_name": {
-            "type": "string"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "filename": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "FILE",
-              "IMAGE"
-            ]
-          }
-        }
-      },
-      "PostResponseDto": {
-        "type": "object",
-        "properties": {
-          "parent_id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "is_author": {
-            "type": "boolean"
-          },
-          "author_id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "author_name": {
-            "type": "string"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "text": {
-            "type": "string"
-          },
-          "documents": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DocumentResponseDto"
-            }
-          }
-        }
-      },
-      "CreateTopicRequestDto": {
-        "required": [
-          "authorId",
-          "name",
-          "parentId",
-          "text"
-        ],
-        "type": "object",
-        "properties": {
-          "parentId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "authorId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "text": {
-            "maxLength": 200,
-            "minLength": 0,
-            "type": "string"
-          },
-          "files": {
-            "maxItems": 5,
-            "minItems": 0,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "binary"
-            }
-          }
-        }
-      },
-      "CreateSectionRequestDto": {
-        "required": [
-          "name",
-          "parent_id"
-        ],
-        "type": "object",
-        "properties": {
-          "parent_id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
       "CreatePostRequestDto": {
         "required": [
           "authorId",
@@ -1372,6 +1647,115 @@
               "type": "string",
               "format": "binary"
             }
+          },
+          "isAnonymous": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateNewsRequestDto": {
+        "required": [
+          "name",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "files": {
+            "maxItems": 5,
+            "minItems": 0,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            }
+          }
+        }
+      },
+      "NewsResponseDto": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentResponseDto"
+            }
+          }
+        }
+      },
+      "CreateNewsCommentRequestDto": {
+        "required": [
+          "newsId",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "newsId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "text": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "isAnonymous": {
+            "type": "boolean"
+          }
+        }
+      },
+      "NewsCommentResponseDto": {
+        "type": "object",
+        "properties": {
+          "threadId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "post": {
+            "$ref": "#/components/schemas/PostResponseDto"
+          }
+        }
+      },
+      "CreateCommentInThreadRequestDto": {
+        "required": [
+          "text",
+          "threadId"
+        ],
+        "type": "object",
+        "properties": {
+          "threadId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "text": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
           },
           "isAnonymous": {
             "type": "boolean"
@@ -1424,37 +1808,6 @@
           }
         }
       },
-      "UpdateAccountRequestDto": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "gender": {
-            "type": "string",
-            "enum": [
-              "NOT_SPECIFIED",
-              "MALE",
-              "FEMALE",
-              "APACHE_HELICOPTER"
-            ]
-          },
-          "avatar": {
-            "type": "string",
-            "format": "binary"
-          }
-        }
-      },
       "AccountResponseDto": {
         "type": "object",
         "properties": {
@@ -1485,6 +1838,37 @@
           },
           "enabled": {
             "type": "boolean"
+          }
+        }
+      },
+      "UpdateAccountRequestDto": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "NOT_SPECIFIED",
+              "MALE",
+              "FEMALE",
+              "APACHE_HELICOPTER"
+            ]
+          },
+          "avatar": {
+            "type": "string",
+            "format": "binary"
           }
         }
       },
@@ -1531,6 +1915,72 @@
           },
           "posts": {
             "$ref": "#/components/schemas/PageResponseDtoPostResponseDto"
+          }
+        }
+      },
+      "PageResponseDtoShortNewsResponseDto": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShortNewsResponseDto"
+            }
+          }
+        }
+      },
+      "ShortNewsResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "PageResponseDtoNewsCommentResponseDto": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NewsCommentResponseDto"
+            }
           }
         }
       },

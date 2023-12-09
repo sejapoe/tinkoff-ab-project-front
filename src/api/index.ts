@@ -20,7 +20,6 @@ const api = new Api<string>({
         secure: true
     },
     securityWorker: (token) => {
-        console.log(token)
         return token ? {headers: {Authorization: `Bearer ${token}`}} : {};
     }
 })

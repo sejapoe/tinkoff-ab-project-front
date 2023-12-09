@@ -1,16 +1,14 @@
-import {RequestParams, UpdateAccountRequestDto} from "../../../api/Api";
+import {RequestParams} from "../../../api/Api";
 import {PageRequest} from "../../../model/page";
 import {useMutation, UseMutationOptions, useQuery} from "@tanstack/react-query";
 import api, {GenericErrorModel} from "../../../api";
 import {mapPageAccounts, PageAccounts} from "../model";
-import {Account, mapAccount} from "../../profile/model";
-import {Section} from "../../section/model";
 import {accountKeys} from "../../profile/api";
 
 export const usersKeys = {
     users: {
         root: ["accounts"],
-        byPage: (page: PageRequest) => [usersKeys.users.root, page]
+        byPage: (page: PageRequest) => [...usersKeys.users.root, page]
     },
 
     mutations: {

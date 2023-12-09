@@ -6,6 +6,9 @@ import {LoginForm} from "../features/auth/components/LoginForm";
 import {SignUpForm} from "../features/auth/components/SignUpForm";
 import {Profile} from "../features/profile/components/Profile";
 import {ProfileEdit} from "../features/profile/components/ProfileEdit";
+import {Settings} from "../features/settings/components/Settings";
+import {AllNewsPage} from "../features/news/components/AllNewsPage";
+import {NewsPage} from "../features/news/components/NewsPage";
 
 export const AppRoutes = () => {
     return useRoutes([
@@ -14,7 +17,15 @@ export const AppRoutes = () => {
             element: <MainLayout/>,
             children: [
                 {
-                    path: "",
+                  path: "",
+                  element: <AllNewsPage/>
+                },
+                {
+                    path: "news/:newsId",
+                    element: <NewsPage/>
+                },
+                {
+                    path: "sections",
                     element: <RootSectionView/>
                 },
                 {
@@ -36,6 +47,10 @@ export const AppRoutes = () => {
                 {
                     path: "profile/:id",
                     element: <Profile/>
+                },
+                {
+                    path: "settings",
+                    element: <Settings/>
                 },
                 {
                     path: "login",

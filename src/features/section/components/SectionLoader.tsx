@@ -58,7 +58,7 @@ const CreateTopicForm = ({section}: { section: SectionWithSubsections }) => {
                     nav(`/topics/${data.id}`)
                 },
                 onError: err => {
-                    alert(err.error.detail)
+                    alert(err.error.detail || "Ошибка")
                 }
             })
         }} className="space-y-4">
@@ -135,7 +135,8 @@ function CreateTopicFormWrapper({section}: { section: SectionWithSubsections }) 
 const Section = ({section}: SectionProps) => {
     return <div className="px-8">
         {section.parent &&
-            <Link to={`/sections/${section.parent.id}`} className="text-xl text-blue-500 hover:text-blue-700">
+            <Link to={section.parent.id === -1 ? "/sections" : `/sections/${section.parent.id}`}
+                  className="text-xl text-blue-500 hover:text-blue-700">
                 <FontAwesomeIcon icon={solid("chevron-left")} className="mr-2"/>{section.parent.name}
             </Link>}
         <div className="flex items-center space-x-5">

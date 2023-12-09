@@ -1,4 +1,4 @@
-import {Outlet, useLocation, useNavigate, useSearchParams} from "react-router-dom";
+import {Link, Outlet, useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import {deleteToken, useCurrentUser} from "../features/auth/model";
 import {useQueryClient} from "@tanstack/react-query";
 import {sectionKeys} from "../features/section/api";
@@ -30,13 +30,25 @@ export const MainLayout = () => {
                 "w-full h-12 shadow flex justify-between items-center",
                 user && (user.roles.includes("ROLE_ADMIN") ? "bg-red-300" : "bg-cyan-300")
             )}>
-                <div className="mx-4 text-xl text-blue-700 cursor-pointer" onClick={() => nav("/")}>
-                    <FontAwesomeIcon icon={solid("home")}/>
+                <div className="flex mx-4 space-x-4">
+                    <div className="text-xl text-blue-700 hover:text-cyan-700 cursor-pointer" onClick={() => nav("/")}>
+                        <FontAwesomeIcon icon={solid("home")}/>
+                    </div>
+                    <div className="text-xl text-blue-700 hover:text-cyan-700 cursor-pointer" onClick={() => nav("/sections")}>
+                        <FontAwesomeIcon icon={solid("folder-tree")}/>
+                    </div>
                 </div>
+
                 <div>
                     {
                         user ?
                             <div className="mx-4 space-x-2">
+                                {
+                                    user.roles.includes("ROLE_ADMIN") &&
+                                    <Link to={"/settings"} className="hover:text-cyan-700 text-blue-700">
+                                        <FontAwesomeIcon icon={solid("gear")}/>
+                                    </Link>
+                                }
                                 <button onClick={() => nav("/profile")}
                                         className="hover:text-cyan-700 text-blue-700">
                                     {user.username}

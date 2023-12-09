@@ -10,6 +10,7 @@ import Pageable from "../../../ui/pageable/Pageable";
 import {UniversalPaginationController} from "../../../ui/pageable/UniversalPaginationController";
 import {MAX_FILE_SIZE, MAX_SUMMARY_FILE_SIZE} from "../../../utils/consants";
 import {useCurrentUser} from "../../auth/model";
+import clsx from "clsx";
 
 export type CreateFormProps = {
     parentId: number
@@ -51,7 +52,7 @@ const CreateForm = ({parentId}: CreateFormProps) => {
                 },
                 onError: err => {
                     console.log(err)
-                    alert(err.error.detail)
+                    alert(err.error.detail || "Ошибка")
                 }
             })
         }
@@ -142,15 +143,14 @@ const TopicComponent = ({
                         </div>}
                     <div className="flex justify-between items-center pt-2 border-t border-gray-600 text-gray-600">
                         {
-                            value.authorId === -1
-                                ? <span className="text-lg">
-                                    <FontAwesomeIcon icon={solid("user-secret")} className="mr-1"/>
-                                    {value.authorName}{value.isAuthor ? " (Вы)" : ""}
-                                </span>
-                                : <Link to={`/profile/${value.authorId}`} className="text-blue-700">
-                                    <FontAwesomeIcon icon={solid("user")} className="mr-2"/>
-                                    {value.authorName}{value.isAuthor ? " (Вы)" : ""}
-                                </Link>
+                            <Link to={`/profile/${value.authorId}`} className={clsx(
+                                !user?.roles.includes("ROLE_ADMIN") && value.isAnonymous ? "pointer-events-none" : "text-blue-700"
+                            )}>
+                                <FontAwesomeIcon icon={
+                                    value.isAnonymous ? solid("user-secret") : solid("user")
+                                } className="mr-2"/>
+                                {value.authorName}{value.isAuthor ? " (Вы)" : ""}
+                            </Link>
                         }
                         <span>
                             <FontAwesomeIcon icon={regular("clock")} className="mr-2"/>
