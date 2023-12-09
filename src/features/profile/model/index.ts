@@ -20,6 +20,7 @@ export type Account = {
     gender: Gender;
     avatar?: Document;
     isEnabled: boolean;
+    roles: string[];
 }
 
 export const mapAccount = (data: AccountResponseDto): Account => ({
@@ -29,5 +30,6 @@ export const mapAccount = (data: AccountResponseDto): Account => ({
     gender: data.gender || "NOT_SPECIFIED",
     description: data.description || "",
     avatar: data.avatar && mapDocument(data.avatar),
-    isEnabled: !!data.enabled
+    isEnabled: !!data.enabled,
+    roles: data.roles!
 })

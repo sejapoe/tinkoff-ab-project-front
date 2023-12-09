@@ -224,6 +224,7 @@ export interface AccountResponseDto {
     gender?: "NOT_SPECIFIED" | "MALE" | "FEMALE" | "APACHE_HELICOPTER";
     avatar?: DocumentResponseDto;
     enabled?: boolean;
+    roles?: string[];
 }
 
 export interface UpdateAccountRequestDto {

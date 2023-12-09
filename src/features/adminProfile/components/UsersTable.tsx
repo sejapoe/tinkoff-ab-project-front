@@ -1,5 +1,5 @@
 import React from 'react';
-import {useAccounts, useBanAccount, usersKeys} from "../api";
+import {useAccounts, useBanAccount, useDemote, usePromote, usersKeys} from "../api";
 import Pageable from "../../../ui/pageable/Pageable";
 import {PageAccounts} from "../model";
 import {Account, genderL10n} from "../../profile/model";
@@ -18,28 +18,54 @@ type ActionsProps = {
 const Actions = ({account}: ActionsProps) => {
     const user = useCurrentUser();
     const queryClient = useQueryClient()
-    const {mutate} = useBanAccount({
+
+    const options = {
         onSuccess: async () => {
-            await queryClient.invalidateQueries()
+            await queryClient.invalidateQueries({queryKey: usersKeys.users.root})
         }
-    })
+    };
+
+    const {mutate: ban} = useBanAccount(options)
+    const {mutate: promote} = usePromote(options)
+    const {mutate: demote} = useDemote(options)
 
 
     return (
-        <div>
+        <div className="space-x-4">
             {!account.isEnabled
-                ? "Уже забанен"
+                ? "banned"
                 : account.id === user?.id
                     ? "Это вы"
-                    : <FontAwesomeIcon icon={solid("hammer")}
-                                       className="cursor-pointer text-red-500 hover:text-pink-600"
-                                       title="Бан хаммер"
-                                       onClick={() => {
-                                           mutate(account.id)
-                                       }}/>}
+                    : <>
+                        {account.roles.includes("ROLE_MODERATOR") ? <FontAwesomeIcon icon={solid("down-long")}
+                                         className="cursor-pointer text-blue-700 hover:text-cyan-600"
+                                         title="Снять с модерки"
+                                         onClick={() => {
+                                             demote(account.id)
+                                         }}/>
+                        : <FontAwesomeIcon icon={solid("up-long")}
+                                         className="cursor-pointer text-green-500 hover:text-lime-600"
+                                         title="Повысить до модератора"
+                                         onClick={() => {
+                                             promote(account.id)
+                                         }}/>}
+                        <FontAwesomeIcon icon={solid("hammer")}
+                                         className="cursor-pointer text-red-500 hover:text-pink-600"
+                                         title="Бан хаммер"
+                                         onClick={() => {
+                                             ban(account.id)
+                                         }}/>
+                    </>
+            }
         </div>
     );
 };
+
+const roleL10n: Record<string, string> = {
+    "ROLE_USER": "Юзверь",
+    "ROLE_MODERATOR": "Модер",
+    "ROLE_ADMIN": "Админ"
+}
 
 type UsersTableContentProps = {
     accounts: PageAccounts;
@@ -54,6 +80,7 @@ const UsersTableContent = ({accounts}: UsersTableContentProps) => {
             <tr>
                 <th>#</th>
                 <th>Логин</th>
+                <th>Роль</th>
                 <th>Гендер</th>
                 <th>Отображаемое имя</th>
                 <th>Действия</th>
@@ -66,6 +93,7 @@ const UsersTableContent = ({accounts}: UsersTableContentProps) => {
                 <td>{value.id}</td>
                 <td><Link to={`/profile/${value.id}`}
                           className="text-blue-700 hover:text-cyan-700 cursor-pointer">{value.name}</Link></td>
+                <td>{roleL10n[value.roles.sort()[0]]}</td>
                 <td>{genderL10n[value.gender]}</td>
                 <td>{value.displayName}</td>
                 <td><Actions account={value}/></td>
