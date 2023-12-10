@@ -46,7 +46,7 @@ export const CreateNewsForm = () => {
                                 setText("")
                                 setFiles([])
                                 formRef.current?.reset()
-                                nav(`/topics/${data.id}`)
+                                nav(`/news/${data.id}`)
                             },
                             onError: err => {
                                 alert(err.error.detail || "Ошибка")
