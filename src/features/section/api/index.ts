@@ -12,7 +12,8 @@ export const sectionKeys = {
     },
 
     mutations: {
-        createSection: ['sections', 'create']
+        createSection: () => [...sectionKeys.sections.root, 'create'],
+        deleteSection: () => [...sectionKeys.sections.root, 'delete'],
     }
 }
 
@@ -58,11 +59,25 @@ type UseCreateSectionOptions = Omit<UseCreateSectionMutation, 'mutationFn' | 'mu
 
 export const useCreateSection = (options?: UseCreateSectionOptions) =>
     useMutation<Section, GenericErrorModel, CreateSectionRequestDto, unknown[]>({
-        mutationKey: sectionKeys.mutations.createSection,
+        mutationKey: sectionKeys.mutations.createSection(),
         mutationFn: async (dto) => {
             const response = await api.sections.createSection(dto)
 
             return mapSection(response.data)
+        },
+        ...options
+    })
+
+
+export type UseDeleteSectionMutation = UseMutationOptions<void, GenericErrorModel, number, unknown[]>
+
+type UseDeleteSectionOptions = Omit<UseDeleteSectionMutation, 'mutationFn' | 'mutationKey'>
+
+export const useDeleteSection = (options?: UseDeleteSectionOptions) =>
+    useMutation<void, GenericErrorModel, number, unknown[]>({
+        mutationKey: sectionKeys.mutations.createSection(),
+        mutationFn: async (id) => {
+            await api.sections.deleteSection(id);
         },
         ...options
     })

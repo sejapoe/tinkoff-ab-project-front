@@ -1,6 +1,6 @@
 import {SectionWithSubsections} from "../model";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {sectionKeys, useCreateSection, useRootSection, useSection} from "../api";
+import {sectionKeys, useCreateSection, useDeleteSection, useRootSection, useSection} from "../api";
 import {useRef, useState} from "react";
 import {useQueryClient} from "@tanstack/react-query";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -133,6 +133,14 @@ function CreateTopicFormWrapper({section}: { section: SectionWithSubsections }) 
 }
 
 const Section = ({section}: SectionProps) => {
+    const user = useCurrentUser()
+    const queryClient = useQueryClient()
+    const {mutate: deleteSubject} = useDeleteSection({
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({queryKey: sectionKeys.sections.byId(section.id)})
+        }
+    })
+
     return <div className="px-8">
         {section.parent &&
             <Link to={section.parent.id === -1 ? "/sections" : `/sections/${section.parent.id}`}
@@ -150,6 +158,10 @@ const Section = ({section}: SectionProps) => {
             {section.page.subsections.map(value => (
                 <li key={`section-${value.id}`} className="text-xl ml-4 text-blue-500 hover:text-blue-700 w-fit">
                     <FontAwesomeIcon icon={regular("folder")}/> <Link to={`/sections/${value.id}`}>{value.name}</Link>
+                    {section.rights.canCreateSubsections && user?.roles.includes("ROLE_ADMIN") &&
+                        <FontAwesomeIcon icon={solid("trash")}
+                                         className="text-xl text-yellow-600 hover:text-yellow-800 cursor-pointer ml-4"
+                                         onClick={() => deleteSubject(value.id)}/>}
                 </li>
             ))}
             {section.page.topics.map(value => (

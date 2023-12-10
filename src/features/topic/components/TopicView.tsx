@@ -4,13 +4,14 @@ import {topicKeys, useDeleteTopic, useTopic} from "../api";
 import {regular, solid} from "@fortawesome/fontawesome-svg-core/import.macro";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useRef, useState} from "react";
-import {useCreatePost, useDeletePost} from "../../post/api";
+import {useCreatePost, useDeletePost, useUpdatePost} from "../../post/api";
 import {useQueryClient} from "@tanstack/react-query";
 import Pageable from "../../../ui/pageable/Pageable";
 import {UniversalPaginationController} from "../../../ui/pageable/UniversalPaginationController";
 import {MAX_FILE_SIZE, MAX_SUMMARY_FILE_SIZE} from "../../../utils/consants";
 import {useCurrentUser} from "../../auth/model";
 import clsx from "clsx";
+import {Edited} from "../../post/components/Edited";
 
 export type CreateFormProps = {
     parentId: number
@@ -106,6 +107,11 @@ const TopicComponent = ({
             await queryClient.invalidateQueries({queryKey: topicKeys.topics.root})
         }
     })
+    const {mutate: updatePost} = useUpdatePost({
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({queryKey: topicKeys.topics.root})
+        }
+    })
 
     return <div className="px-8">
         <Link to={`/sections/${topic.parentId}`} className="text-xl text-blue-500 hover:text-blue-700">
@@ -155,6 +161,22 @@ const TopicComponent = ({
                         <span>
                             <FontAwesomeIcon icon={regular("clock")} className="mr-2"/>
                             {new Date(value.createdAt).toLocaleString()}
+                            {value.modified && value.updateAt && <Edited updateAt={value.updateAt} id={value.id}/>}
+                            {
+                                value.isAuthor &&
+                                <FontAwesomeIcon icon={solid("edit")}
+                                                 className="ml-2 text-green-700 hover:text-green-800 cursor-pointer"
+                                                 onClick={() => {
+                                                     const s = prompt("Введите новое сообщение")
+                                                     if (s) {
+                                                         updatePost({
+                                                             id: value.id,
+                                                             text: s,
+                                                         })
+                                                     }
+                                                 }}
+                                />
+                            }
                             {
                                 user?.roles.includes("ROLE_MODERATOR") &&
                                 <FontAwesomeIcon icon={solid("trash")}

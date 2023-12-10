@@ -1,4 +1,9 @@
-import {DocumentResponseDto, PageResponseDtoPostResponseDto, PostResponseDto} from "../../../api/Api";
+import {
+    DocumentResponseDto,
+    PageResponseDtoPostResponseDto,
+    PostAuditResponseDto,
+    PostResponseDto
+} from "../../../api/Api";
 
 export type Document = {
     filename: string;
@@ -17,6 +22,8 @@ export type Post = {
     createdAt: string;
     isAuthor: boolean;
     isAnonymous: boolean;
+    modified: boolean;
+    updateAt?: string;
     authorId: number
     authorName: string;
     documents: Document[]
@@ -29,6 +36,8 @@ export const mapPost = (dto: PostResponseDto): Post => ({
     createdAt: dto?.created_at || "",
     isAuthor: dto?.is_author || false,
     isAnonymous: dto?.is_anonymous || false,
+    modified: dto?.modified || false,
+    updateAt: dto?.updated_at,
     authorId: dto?.author_id || -1,
     authorName: dto?.author_name || "",
     documents: dto?.documents?.map(mapDocument) || [],
@@ -48,4 +57,16 @@ export const mapPagePosts = (dto: PageResponseDtoPostResponseDto): PagePosts => 
     totalPages: dto.totalPages!,
     totalElements: dto.totalElements!,
     content: dto.content?.map(mapPost) || []
+})
+
+export type PostHistory = {
+    id: number;
+    text: string;
+    updatedAt: string;
+}
+
+export const mapPostHistory = (dto: PostAuditResponseDto): PostHistory => ({
+    id: dto.id!,
+    text: dto.text!,
+    updatedAt: dto.updated_at!,
 })

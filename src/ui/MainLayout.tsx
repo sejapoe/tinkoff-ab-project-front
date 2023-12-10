@@ -28,13 +28,15 @@ export const MainLayout = () => {
         <div className="w-screen h-[90vh]">
             <div className={clsx(
                 "w-full h-12 shadow flex justify-between items-center",
-                user && (user.roles.includes("ROLE_ADMIN") ? "bg-red-300" : "bg-cyan-300")
+                user && (user.roles.includes("ROLE_ADMIN") ? "bg-red-300" :
+                    (user.roles.includes("ROLE_MODERATOR") ? "bg-green-300" : "bg-cyan-300"))
             )}>
                 <div className="flex mx-4 space-x-4">
                     <div className="text-xl text-blue-700 hover:text-cyan-700 cursor-pointer" onClick={() => nav("/")}>
                         <FontAwesomeIcon icon={solid("home")}/>
                     </div>
-                    <div className="text-xl text-blue-700 hover:text-cyan-700 cursor-pointer" onClick={() => nav("/sections")}>
+                    <div className="text-xl text-blue-700 hover:text-cyan-700 cursor-pointer"
+                         onClick={() => nav("/sections")}>
                         <FontAwesomeIcon icon={solid("folder-tree")}/>
                     </div>
                 </div>

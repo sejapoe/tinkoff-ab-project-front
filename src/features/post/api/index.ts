@@ -1,17 +1,19 @@
-import {useMutation, UseMutationOptions} from "@tanstack/react-query";
-import {CreatePostRequestDto} from "../../../api/Api";
-import {mapPost, Post} from "../model";
+import {useMutation, UseMutationOptions, useQuery} from "@tanstack/react-query";
+import {CreatePostRequestDto, PostAuditResponseDto, RequestParams, UpdatePostRequestDto} from "../../../api/Api";
+import {mapPost, mapPostHistory, Post, PostHistory} from "../model";
 import api, {GenericErrorModel} from "../../../api";
 import {topicKeys} from "../../topic/api";
 
 export const postKeys = {
     posts: {
         root: ['posts'],
-        byId: (id: number) => [...postKeys.posts.root, id]
+        byId: (id: number) => [...postKeys.posts.root, id],
+        history: (id: number) => [...postKeys.posts.byId(id), "history"],
     },
     mutations: {
         createPost: (sectionId: number) => [...postKeys.posts.byId(sectionId), 'createPost'],
-        deletePost: () => [...postKeys.posts.root, 'delete']
+        deletePost: () => [...postKeys.posts.root, 'delete'],
+        updatePost: () => [...postKeys.posts.root, 'update']
     }
 };
 
@@ -30,6 +32,22 @@ export const useCreatePost = (sectionId: number, options?: UseCreatePostOptions)
         ...options
     })
 
+export type UseUpdatePostMutation = UseMutationOptions<Post, GenericErrorModel, UpdatePostRequestDto, unknown[]>
+
+type UseUpdatePostOptions = Omit<UseUpdatePostMutation, 'mutationFn' | 'mutationKey'>
+
+export const useUpdatePost = (options?: UseUpdatePostOptions) =>
+    useMutation<Post, GenericErrorModel, UpdatePostRequestDto, unknown[]>({
+        mutationKey: postKeys.mutations.updatePost(),
+        mutationFn: async (dto) => {
+            const response = await api.post.update(dto);
+
+            return mapPost(response.data)
+        },
+        ...options
+    })
+
+
 // ---------------------------------------------------------
 // -------------          admin         --------------------
 // ---------------------------------------------------------
@@ -40,9 +58,22 @@ type UseDeletePostOptions = Omit<UseDeletePostMutation, 'mutationFn' | 'mutation
 
 export const useDeletePost = (options?: UseDeletePostOptions) =>
     useMutation<void, GenericErrorModel, number, unknown[]>({
-        mutationKey: topicKeys.mutations.deleteTopic(),
+        mutationKey: postKeys.mutations.deletePost(),
         mutationFn: async (id) => {
             await api.post.delete1({id})
         },
         ...options
+    })
+
+
+export const usePostHistory = (id: number, params?: RequestParams) =>
+    useQuery<PostHistory[], GenericErrorModel, PostHistory[], unknown[]>({
+        queryKey: postKeys.posts.history(id),
+        queryFn: async ({signal}) => {
+            const response = await api.audit.getRevisions({id}, {
+                signal,
+                ...params
+            })
+            return response.data.map(mapPostHistory)
+        },
     })

@@ -8,9 +8,11 @@ import clsx from "clsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {regular, solid} from "@fortawesome/fontawesome-svg-core/import.macro";
 import {useCurrentUser} from "../../auth/model";
-import {useDeletePost} from "../../post/api";
+import {useDeletePost, useUpdatePost} from "../../post/api";
 import {useQueryClient} from "@tanstack/react-query";
 import {CreateNewsThreadComment} from "./CreateNewsThreadComment";
+import {Edited} from "../../post/components/Edited";
+import {queryClient} from "../../../lib/react-query";
 
 type ThreadContentProps = {
     id: number;
@@ -22,6 +24,11 @@ const ThreadContent = ({id, page}: ThreadContentProps) => {
     const user = useCurrentUser();
     const {data: comments} = useNewsThreadComments(id, page)
     const {mutate: deletePost} = useDeletePost({
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({queryKey: newsKeys.news.root})
+        }
+    })
+    const {mutate: updatePost} = useUpdatePost({
         onSuccess: async () => {
             await queryClient.invalidateQueries({queryKey: newsKeys.news.root})
         }
@@ -49,6 +56,22 @@ const ThreadContent = ({id, page}: ThreadContentProps) => {
                         <span>
                             <FontAwesomeIcon icon={regular("clock")} className="mr-2"/>
                             {new Date(value.createdAt).toLocaleString()}
+                            {value.modified && value.updateAt && <Edited updateAt={value.updateAt} id={value.id}/>}
+                            {
+                                value.isAuthor &&
+                                <FontAwesomeIcon icon={solid("edit")}
+                                                 className="ml-2 text-green-700 hover:text-green-800 cursor-pointer"
+                                                 onClick={() => {
+                                                     const s = prompt("Введите новое сообщение")
+                                                     if (s) {
+                                                         updatePost({
+                                                             id: value.id,
+                                                             text: s,
+                                                         })
+                                                     }
+                                                 }}
+                                />
+                            }
                             {
                                 user?.roles.includes("ROLE_MODERATOR") &&
                                 <FontAwesomeIcon icon={solid("trash")}

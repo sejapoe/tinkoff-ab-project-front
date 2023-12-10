@@ -22,45 +22,6 @@ export interface TriggerResponseDto {
     cron?: string;
 }
 
-export interface UpdatePostRequestDto {
-    /** @format int64 */
-    parent_id: number;
-    /** @format int64 */
-    author_id: number;
-    is_anonymous?: boolean;
-    /** @format int64 */
-    id: number;
-    /**
-     * @minLength 0
-     * @maxLength 200
-     */
-    text: string;
-}
-
-export interface DocumentResponseDto {
-    original_name?: string;
-    /** @format int64 */
-    id?: number;
-    filename?: string;
-    type?: "FILE" | "IMAGE";
-}
-
-export interface PostResponseDto {
-    /** @format int64 */
-    parent_id?: number;
-    is_author?: boolean;
-    is_anonymous?: boolean;
-    /** @format int64 */
-    author_id?: number;
-    author_name?: string;
-    /** @format date-time */
-    created_at?: string;
-    /** @format int64 */
-    id?: number;
-    text?: string;
-    documents?: DocumentResponseDto[];
-}
-
 export interface CreateTopicRequestDto {
     /** @format int64 */
     parentId: number;
@@ -142,6 +103,33 @@ export interface CreatePostRequestDto {
     isAnonymous?: boolean;
 }
 
+export interface DocumentResponseDto {
+    original_name?: string;
+    /** @format int64 */
+    id?: number;
+    filename?: string;
+    type?: "FILE" | "IMAGE";
+}
+
+export interface PostResponseDto {
+    /** @format int64 */
+    parent_id?: number;
+    is_author?: boolean;
+    is_anonymous?: boolean;
+    /** @format int64 */
+    author_id?: number;
+    author_name?: string;
+    /** @format date-time */
+    created_at?: string;
+    /** @format date-time */
+    updated_at?: string;
+    /** @format int64 */
+    id?: number;
+    text?: string;
+    modified?: boolean;
+    documents?: DocumentResponseDto[];
+}
+
 export interface CreateNewsRequestDto {
     name: string;
     /**
@@ -215,6 +203,16 @@ export interface JwtRequestDto {
     password?: string;
 }
 
+export interface UpdatePostRequestDto {
+    /** @format int64 */
+    id: number;
+    /**
+     * @minLength 0
+     * @maxLength 200
+     */
+    text: string;
+}
+
 export interface AccountResponseDto {
     /** @format int64 */
     id?: number;
@@ -286,6 +284,14 @@ export interface PageResponseDtoNewsCommentResponseDto {
     /** @format int64 */
     totalElements?: number;
     content?: NewsCommentResponseDto[];
+}
+
+export interface PostAuditResponseDto {
+    /** @format date-time */
+    updated_at?: string;
+    /** @format int64 */
+    id?: number;
+    text?: string;
 }
 
 export interface PageResponseDtoAccountResponseDto {
@@ -542,102 +548,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 ...params,
             }),
     };
-    post = {
-        /**
-         * @description Получение поста
-         *
-         * @tags post
-         * @name Get1
-         * @request GET:/post
-         */
-        get1: (
-            query: {
-                /** @format int64 */
-                id: number;
-            },
-            params: RequestParams = {},
-        ) =>
-            this.request<PostResponseDto, PostResponseDto>({
-                path: `/post`,
-                method: "GET",
-                query: query,
-                ...params,
-            }),
-
-        /**
-         * @description Обновление поста
-         *
-         * @tags post
-         * @name Update
-         * @request PUT:/post
-         */
-        update: (data: UpdatePostRequestDto, params: RequestParams = {}) =>
-            this.request<PostResponseDto, PostResponseDto>({
-                path: `/post`,
-                method: "PUT",
-                body: data,
-                type: ContentType.Json,
-                ...params,
-            }),
-
-        /**
-         * @description Удаление своего поста
-         *
-         * @tags post
-         * @name Delete1
-         * @request DELETE:/post
-         */
-        delete1: (
-            query: {
-                /** @format int64 */
-                id: number;
-            },
-            params: RequestParams = {},
-        ) =>
-            this.request<number, number>({
-                path: `/post`,
-                method: "DELETE",
-                query: query,
-                ...params,
-            }),
-
-        /**
-         * @description Создание поста
-         *
-         * @tags post
-         * @name CreateWithAttachments
-         * @request POST:/post/withattach
-         */
-        createWithAttachments: (data: CreatePostRequestDto, params: RequestParams = {}) =>
-            this.request<PostResponseDto, PostResponseDto>({
-                path: `/post/withattach`,
-                method: "POST",
-                body: data,
-                type: ContentType.FormData,
-                ...params,
-            }),
-
-        /**
-         * @description Удаление поста администратором
-         *
-         * @tags post
-         * @name DeleteAdmin
-         * @request DELETE:/post/admin
-         */
-        deleteAdmin: (
-            query: {
-                /** @format int64 */
-                id: number;
-            },
-            params: RequestParams = {},
-        ) =>
-            this.request<number, number>({
-                path: `/post/admin`,
-                method: "DELETE",
-                query: query,
-                ...params,
-            }),
-    };
     topic = {
         /**
          * @description Создание топика
@@ -778,6 +688,102 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 ...params,
             }),
     };
+    post = {
+        /**
+         * @description Создание поста
+         *
+         * @tags post
+         * @name CreateWithAttachments
+         * @request POST:/post/withattach
+         */
+        createWithAttachments: (data: CreatePostRequestDto, params: RequestParams = {}) =>
+            this.request<PostResponseDto, PostResponseDto>({
+                path: `/post/withattach`,
+                method: "POST",
+                body: data,
+                type: ContentType.FormData,
+                ...params,
+            }),
+
+        /**
+         * @description Получение поста
+         *
+         * @tags post
+         * @name Get1
+         * @request GET:/post
+         */
+        get1: (
+            query: {
+                /** @format int64 */
+                id: number;
+            },
+            params: RequestParams = {},
+        ) =>
+            this.request<PostResponseDto, PostResponseDto>({
+                path: `/post`,
+                method: "GET",
+                query: query,
+                ...params,
+            }),
+
+        /**
+         * @description Удаление своего поста
+         *
+         * @tags post
+         * @name Delete1
+         * @request DELETE:/post
+         */
+        delete1: (
+            query: {
+                /** @format int64 */
+                id: number;
+            },
+            params: RequestParams = {},
+        ) =>
+            this.request<number, number>({
+                path: `/post`,
+                method: "DELETE",
+                query: query,
+                ...params,
+            }),
+
+        /**
+         * @description Обновление поста
+         *
+         * @tags post
+         * @name Update
+         * @request PATCH:/post
+         */
+        update: (data: UpdatePostRequestDto, params: RequestParams = {}) =>
+            this.request<PostResponseDto, PostResponseDto>({
+                path: `/post`,
+                method: "PATCH",
+                body: data,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * @description Удаление поста администратором
+         *
+         * @tags post
+         * @name DeleteAdmin
+         * @request DELETE:/post/admin
+         */
+        deleteAdmin: (
+            query: {
+                /** @format int64 */
+                id: number;
+            },
+            params: RequestParams = {},
+        ) =>
+            this.request<number, number>({
+                path: `/post/admin`,
+                method: "DELETE",
+                query: query,
+                ...params,
+            }),
+    };
     news = {
         /**
          * No description
@@ -838,7 +844,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags news
-         * @name CreateComment1
+         * @name CreateThreadComment
          * @request POST:/news/comments/thread
          */
         createThreadComment: (data: CreateCommentInThreadRequestDto, params: RequestParams = {}) =>
@@ -1097,6 +1103,28 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             this.request<File, any>({
                 path: `/images/${filename}`,
                 method: "GET",
+                ...params,
+            }),
+    };
+    audit = {
+        /**
+         * No description
+         *
+         * @tags audit
+         * @name GetRevisions
+         * @request GET:/audit
+         */
+        getRevisions: (
+            query: {
+                /** @format int64 */
+                id: number;
+            },
+            params: RequestParams = {},
+        ) =>
+            this.request<PostAuditResponseDto[], any>({
+                path: `/audit`,
+                method: "GET",
+                query: query,
                 ...params,
             }),
     };
