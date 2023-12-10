@@ -115,7 +115,7 @@ const TopicComponent = ({
             <p className="text-3xl text-black">
                 {topic.name}
             </p>
-            {user?.roles.includes("ROLE_ADMIN") &&
+            {user?.roles.includes("ROLE_MODERATOR") &&
                 <FontAwesomeIcon icon={solid("trash")}
                                  className="text-xl text-yellow-600 hover:text-yellow-800 cursor-pointer"
                                  onClick={() => deleteTopic(topic.id)}/>
@@ -144,7 +144,7 @@ const TopicComponent = ({
                     <div className="flex justify-between items-center pt-2 border-t border-gray-600 text-gray-600">
                         {
                             <Link to={`/profile/${value.authorId}`} className={clsx(
-                                !user?.roles.includes("ROLE_ADMIN") && value.isAnonymous ? "pointer-events-none" : "text-blue-700"
+                                !user?.roles.includes("ROLE_MODERATOR") && value.isAnonymous ? "pointer-events-none" : "text-blue-700"
                             )}>
                                 <FontAwesomeIcon icon={
                                     value.isAnonymous ? solid("user-secret") : solid("user")
@@ -156,7 +156,7 @@ const TopicComponent = ({
                             <FontAwesomeIcon icon={regular("clock")} className="mr-2"/>
                             {new Date(value.createdAt).toLocaleString()}
                             {
-                                user?.roles.includes("ROLE_ADMIN") &&
+                                user?.roles.includes("ROLE_MODERATOR") &&
                                 <FontAwesomeIcon icon={solid("trash")}
                                                  className="ml-2 text-yellow-600 hover:text-yellow-800 cursor-pointer"
                                                  onClick={() => deletePost(value.id)}/>
