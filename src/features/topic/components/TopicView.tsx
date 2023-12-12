@@ -4,7 +4,7 @@ import {topicKeys, useDeleteTopic, useTopic} from "../api";
 import {regular, solid} from "@fortawesome/fontawesome-svg-core/import.macro";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useRef, useState} from "react";
-import {useCreatePost, useDeletePost, useUpdatePost} from "../../post/api";
+import {postKeys, useCreatePost, useDeletePost, useUpdatePost} from "../../post/api";
 import {useQueryClient} from "@tanstack/react-query";
 import Pageable from "../../../ui/pageable/Pageable";
 import {UniversalPaginationController} from "../../../ui/pageable/UniversalPaginationController";
@@ -12,6 +12,7 @@ import {MAX_FILE_SIZE, MAX_SUMMARY_FILE_SIZE} from "../../../utils/consants";
 import {useCurrentUser} from "../../auth/model";
 import clsx from "clsx";
 import {Edited} from "../../post/components/Edited";
+import {queryClient} from "../../../lib/react-query";
 
 export type CreateFormProps = {
     parentId: number
@@ -108,8 +109,9 @@ const TopicComponent = ({
         }
     })
     const {mutate: updatePost} = useUpdatePost({
-        onSuccess: async () => {
+        onSuccess: async (dto) => {
             await queryClient.invalidateQueries({queryKey: topicKeys.topics.root})
+            await queryClient.invalidateQueries({queryKey: postKeys.posts.history(dto.id)})
         }
     })
 

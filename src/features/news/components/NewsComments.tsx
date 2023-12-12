@@ -8,12 +8,12 @@ import {regular, solid} from "@fortawesome/fontawesome-svg-core/import.macro";
 import {Link} from "react-router-dom";
 import clsx from "clsx";
 import {useCurrentUser} from "../../auth/model";
-import {topicKeys, useDeleteTopic} from "../../topic/api";
+import {useDeleteTopic} from "../../topic/api";
 import {Thread} from "./Thread";
 import {queryClient} from "../../../lib/react-query";
 import {CreateNewsComment} from "./CreateNewsComment";
 import {Edited} from "../../post/components/Edited";
-import {useUpdatePost} from "../../post/api";
+import {postKeys, useUpdatePost} from "../../post/api";
 
 type NewsCommentsContentProps = {
     newsId: number;
@@ -29,8 +29,9 @@ const NewsCommentsContent = ({newsId, page}: NewsCommentsContentProps) => {
         }
     })
     const {mutate: updatePost} = useUpdatePost({
-        onSuccess: async () => {
+        onSuccess: async (dto) => {
             await queryClient.invalidateQueries({queryKey: newsKeys.news.root})
+            await queryClient.invalidateQueries({queryKey: postKeys.posts.history(dto.id)})
         }
     })
 
@@ -56,7 +57,8 @@ const NewsCommentsContent = ({newsId, page}: NewsCommentsContentProps) => {
                         <span>
                             <FontAwesomeIcon icon={regular("clock")} className="mr-2"/>
                             {new Date(value.post.createdAt).toLocaleString()}
-                            {value.post.modified && value.post.updateAt && <Edited updateAt={value.post.updateAt} id={value.post.id}/>}
+                            {value.post.modified && value.post.updateAt &&
+                                <Edited updateAt={value.post.updateAt} id={value.post.id}/>}
                             {
                                 value.post.isAuthor &&
                                 <FontAwesomeIcon icon={solid("edit")}

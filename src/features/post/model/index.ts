@@ -8,11 +8,13 @@ import {
 export type Document = {
     filename: string;
     originalName: string;
+    type: "FILE" | "IMAGE";
 }
 
 export const mapDocument = (dto: DocumentResponseDto): Document => ({
     filename: dto?.filename || "",
     originalName: dto?.original_name || "",
+    type: dto.type!
 })
 
 export type Post = {

@@ -8,7 +8,7 @@ import clsx from "clsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {regular, solid} from "@fortawesome/fontawesome-svg-core/import.macro";
 import {useCurrentUser} from "../../auth/model";
-import {useDeletePost, useUpdatePost} from "../../post/api";
+import {postKeys, useDeletePost, useUpdatePost} from "../../post/api";
 import {useQueryClient} from "@tanstack/react-query";
 import {CreateNewsThreadComment} from "./CreateNewsThreadComment";
 import {Edited} from "../../post/components/Edited";
@@ -29,8 +29,9 @@ const ThreadContent = ({id, page}: ThreadContentProps) => {
         }
     })
     const {mutate: updatePost} = useUpdatePost({
-        onSuccess: async () => {
+        onSuccess: async (dto) => {
             await queryClient.invalidateQueries({queryKey: newsKeys.news.root})
+            await queryClient.invalidateQueries({queryKey: postKeys.posts.history(dto.id)})
         }
     })
 

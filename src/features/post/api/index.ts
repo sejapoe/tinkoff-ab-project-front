@@ -60,7 +60,7 @@ export const useDeletePost = (options?: UseDeletePostOptions) =>
     useMutation<void, GenericErrorModel, number, unknown[]>({
         mutationKey: postKeys.mutations.deletePost(),
         mutationFn: async (id) => {
-            await api.post.delete1({id})
+            await api.post.deleteAdmin({id})
         },
         ...options
     })
