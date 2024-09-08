@@ -15,6 +15,7 @@ export interface ProblemDetailDto {
 type GenericErrorModel = HttpResponse<unknown, ProblemDetailDto>
 
 const api = new Api<string>({
+    baseUrl: 'https://sejapoe.ru/nmc',
     baseApiParams: {
         format: "json",
         secure: true
