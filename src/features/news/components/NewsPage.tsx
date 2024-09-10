@@ -28,7 +28,7 @@ export const NewsPage = () => {
                     {images.map(value => (
                         <div key={`document-${value.filename}`}
                              className="flex items-center space-x-2">
-                            <img src={`http://localhost:8080/images/${value.filename}`} alt={value.originalName}/>
+                            <img src={`https://sejapoe.ru/nmc/images/${value.filename}`} alt={value.originalName}/>
                         </div>
                     ))}
                 </div>}
@@ -37,7 +37,7 @@ export const NewsPage = () => {
                     {files.map(value => (
                         <div key={`document-${value.filename}`}
                              className="flex items-center space-x-2">
-                            <a href={`http://localhost:8080/files/${value.filename}`}
+                            <a href={`https://sejapoe.ru/nmc/files/${value.filename}`}
                                target="_blank"
                                rel="noreferrer"
                                className="text-blue-500 hover:text-blue-700">
