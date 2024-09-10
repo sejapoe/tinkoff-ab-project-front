@@ -15,7 +15,7 @@ export const Avatar = ({document, className}: AvatarProps) => (
     )}>
         {document
             ? <img className="w-full aspect-square rounded-full ring-2 ring-gray-800"
-                   src={`http://localhost:8080/images/${document.filename}`}
+                   src={`https://sejapoe.ru/nmc/images/${document.filename}`}
                    alt={"avatar"}/>
             : <div className={clsx(
                 "w-full bg-gray-400 rounded-full aspect-square flex justify-center items-center",
